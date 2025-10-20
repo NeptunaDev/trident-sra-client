@@ -64,6 +64,26 @@ export const translations = {
     // Notifications
     notifications: "Notifications",
     no_notifications: "No new notifications",
+
+    // Profile
+    profile: "Profile",
+    back_to_home: "Back to Home",
+    
+    // Common
+    edit: "Edit",
+    delete: "Delete",
+    add: "Add",
+    search: "Search",
+    filter: "Filter",
+    actions: "Actions",
+    status: "Status",
+    name: "Name",
+    type: "Type",
+    last_active: "Last Active",
+    sessions: "Sessions",
+    total: "Total",
+    connected: "Connected",
+    disconnected: "Disconnected",
   },
   es: {
     // Navigation
@@ -128,6 +148,26 @@ export const translations = {
     // Notifications
     notifications: "Notificaciones",
     no_notifications: "No hay notificaciones nuevas",
+
+    // Profile
+    profile: "Perfil",
+    back_to_home: "Volver al Inicio",
+    
+    // Common
+    edit: "Editar",
+    delete: "Eliminar",
+    add: "Agregar",
+    search: "Buscar",
+    filter: "Filtrar",
+    actions: "Acciones",
+    status: "Estado",
+    name: "Nombre",
+    type: "Tipo",
+    last_active: "Última Actividad",
+    sessions: "Sesiones",
+    total: "Total",
+    connected: "Conectado",
+    disconnected: "Desconectado",
   },
 }
 

@@ -17,6 +17,7 @@ import {
   Terminal,
   Monitor,
   Eye,
+  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
@@ -112,7 +113,7 @@ export function DashboardSidebar() {
                       e.preventDefault()
                       toggleExpand(item.title)
                     }}
-                    className="p-2 hover:bg-[#1a1a2e] hover:text-[#5bc2e7] rounded-md transition-colors"
+                    className="p-2 hover:bg-[#1a1a2e] hover:text-[#5bc2e7] rounded-md transition-colors text-[#c0c5ce]"
                   >
                     {expandedItems.includes(item.title) ? (
                       <ChevronDown className="w-4 h-4" />
@@ -156,6 +157,17 @@ export function DashboardSidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Footer with Home button */}
+      <div className="p-4 border-t border-[rgba(91,194,231,0.2)]">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-[#1a1a2e] hover:text-[#5bc2e7] text-[#c0c5ce]"
+        >
+          <LogOut className="w-4 h-4 rotate-180" />
+          <span>{translations[lang].back_to_home}</span>
+        </Link>
+      </div>
     </aside>
   )
 }

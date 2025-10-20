@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trident SRA - Modelo de Datos</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #333; 
+            text-align: center; 
+            border-bottom: 3px solid #5bc2e7; 
+            padding-bottom: 10px; 
+        }
+        .diagram { 
+            text-align: center; 
+            margin: 30px 0; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trident SRA - Diagrama de Relaciones de Base de Datos</h1>
+        
+        <div class="diagram">
+            <div class="mermaid">
+erDiagram
+    USER ||--o{ SESSION : "inicia/participa"
+    USER ||--o{ CONNECTION : "crea/gestiona"
+    USER ||--o{ SSH_KEY : "posee"
+    USER ||--o{ AUDIT_LOG : "genera"
+    USER }o--|| ROLE : "tiene"
+    
+    CONNECTION ||--o{ SESSION : "genera"
+    CONNECTION }o--|| CONNECTION_TYPE : "es_tipo"
+    CONNECTION ||--o{ AUDIT_LOG : "registra"
+    
+    SESSION ||--o{ COMMAND : "ejecuta"
+    SESSION ||--o{ SESSION_VIEWER : "tiene"
+    SESSION ||--o{ SESSION_RECORDING : "graba"
+    SESSION ||--o{ AUDIT_LOG : "registra"
+    
+    COMMAND }o--|| COMMAND_STATUS : "tiene_estado"
+    COMMAND ||--o{ AUDIT_LOG : "registra"
+    
+    ORGANIZATION ||--o{ USER : "contiene"
+    ORGANIZATION ||--o{ CONNECTION : "posee"
+    ORGANIZATION ||--o{ POLICY : "define"
+    
+    POLICY ||--o{ BLOCKED_COMMAND : "especifica"
+    POLICY }o--o{ ROLE : "aplica_a"
+            </div>
+        </div>
+        
+        <h2>Entidades Principales:</h2>
+        <ul>
+            <li><strong>USER</strong> - Usuarios del sistema</li>
+            <li><strong>ROLE</strong> - Roles y permisos</li>
+            <li><strong>ORGANIZATION</strong> - Organizaciones</li>
+            <li><strong>CONNECTION</strong> - Conexiones SSH/RDP/VNC</li>
+            <li><strong>SSH_KEY</strong> - Claves SSH</li>
+            <li><strong>SESSION</strong> - Sesiones activas</li>
+            <li><strong>SESSION_VIEWER</strong> - Observadores de sesión</li>
+            <li><strong>COMMAND</strong> - Comandos ejecutados</li>
+            <li><strong>POLICY</strong> - Políticas de seguridad</li>
+            <li><strong>BLOCKED_COMMAND</strong> - Comandos bloqueados</li>
+            <li><strong>SESSION_RECORDING</strong> - Grabaciones</li>
+            <li><strong>AUDIT_LOG</strong> - Registros de auditoría</li>
+        </ul>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#5bc2e7',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#4ba8d1',
+                lineColor: '#666',
+                sectionBkgColor: '#f8f9fa',
+                altSectionBkgColor: '#e9ecef',
+                gridColor: '#dee2e6',
+                secondaryColor: '#f8f9fa',
+                tertiaryColor: '#ffffff'
+            }
+        });
+    </script>
+</body>
+</html>
