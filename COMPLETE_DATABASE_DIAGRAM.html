@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trident SRA - Diagrama Completo de Base de Datos</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: rgba(26, 26, 46, 0.9); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 32px rgba(91, 194, 231, 0.1);
+            border: 1px solid rgba(91, 194, 231, 0.2);
+        }
+        h1 { 
+            color: #5bc2e7; 
+            text-align: center; 
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(91, 194, 231, 0.3);
+        }
+        .subtitle {
+            text-align: center;
+            color: #c0c5ce;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .diagram { 
+            text-align: center; 
+            margin: 40px 0; 
+            background: rgba(42, 42, 62, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(91, 194, 231, 0.1);
+        }
+        .legend {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(42, 42, 62, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid #5bc2e7;
+        }
+        .legend h3 {
+            color: #5bc2e7;
+            margin-top: 0;
+        }
+        .legend ul {
+            list-style: none;
+            padding: 0;
+        }
+        .legend li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(91, 194, 231, 0.1);
+        }
+        .legend li:last-child {
+            border-bottom: none;
+        }
+        .entity-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(91, 194, 231, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid #5bc2e7;
+        }
+        .entity-info h4 {
+            color: #5bc2e7;
+            margin: 0 0 10px 0;
+        }
+        .entity-info code {
+            background: rgba(91, 194, 231, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #5bc2e7;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid rgba(91, 194, 231, 0.2);
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Trident SRA</h1>
+        <p class="subtitle">Diagrama Completo de Base de Datos - Secure Remote Access Platform</p>
+        
+        <div class="legend">
+            <h3>📋 Entidades del Sistema (12 Tablas)</h3>
+            <ul>
+                <li><strong>USER</strong> - Usuarios del sistema con credenciales y permisos</li>
+                <li><strong>ROLE</strong> - Roles y permisos (Admin, Technician, Observer)</li>
+                <li><strong>ORGANIZATION</strong> - Organizaciones que agrupan usuarios y recursos</li>
+                <li><strong>CONNECTION</strong> - Conexiones SSH/RDP/VNC configuradas</li>
+                <li><strong>SSH_KEY</strong> - Claves SSH para autenticación</li>
+                <li><strong>SESSION</strong> - Sesiones activas o históricas de conexión</li>
+                <li><strong>SESSION_VIEWER</strong> - Usuarios observando/participando en sesiones</li>
+                <li><strong>COMMAND</strong> - Comandos ejecutados en sesiones</li>
+                <li><strong>POLICY</strong> - Políticas de seguridad de la organización</li>
+                <li><strong>BLOCKED_COMMAND</strong> - Patrones de comandos bloqueados</li>
+                <li><strong>SESSION_RECORDING</strong> - Metadata de grabaciones de sesiones</li>
+                <li><strong>AUDIT_LOG</strong> - Registro completo de auditoría</li>
+            </ul>
+        </div>
+        
+        <div class="diagram">
+            <div class="mermaid">
+erDiagram
+    USER {
+        string id PK "UUID único"
+        string email UK "Email único para login"
+        string password_hash "Hash bcrypt"
+        string name "Nombre completo"
+        string avatar_url "URL del avatar"
+        string bio "Biografía del usuario"
+        string timezone "Zona horaria (UTC-5)"
+        string role_id FK "Referencia a ROLE"
+        string organization_id FK "Referencia a ORGANIZATION"
+        boolean is_active "Estado activo/inactivo"
+        boolean two_factor_enabled "2FA habilitado"
+        string two_factor_secret "Secret para 2FA"
+        datetime last_login "Última sesión"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+        datetime deleted_at "Soft delete"
+    }
+    
+    ROLE {
+        string id PK "UUID único"
+        string name "Admin, Technician, Observer"
+        string description "Descripción del rol"
+        json permissions "Array de permisos"
+        string color "Color hex para UI"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+    }
+    
+    ORGANIZATION {
+        string id PK "UUID único"
+        string name "Nombre de la organización"
+        string slug UK "Identificador URL-friendly"
+        string domain "Dominio corporativo"
+        string logo_url "Logo de la organización"
+        string plan "free, pro, enterprise"
+        integer max_users "Límite de usuarios"
+        integer max_connections "Límite de conexiones"
+        json settings "Configuraciones de la organización"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+    }
+    
+    CONNECTION {
+        string id PK "UUID único"
+        string name "Nombre descriptivo"
+        string type "ssh, rdp, vnc, telnet"
+        string hostname "IP o dominio"
+        integer port "Puerto de conexión"
+        string username "Usuario para conectar"
+        string auth_method "password, ssh_key, certificate"
+        string password_encrypted "Contraseña encriptada"
+        string ssh_key_id FK "Referencia a SSH_KEY"
+        string certificate "Certificado"
+        string description "Descripción de la conexión"
+        json tags "Tags para organización"
+        string environment "production, staging, development"
+        string organization_id FK "Referencia a ORGANIZATION"
+        string created_by_user_id FK "Referencia a USER"
+        string status "active, inactive, archived"
+        datetime last_used "Última vez usada"
+        integer total_sessions "Contador de sesiones"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+        datetime deleted_at "Soft delete"
+    }
+    
+    SSH_KEY {
+        string id PK "UUID único"
+        string name "Nombre descriptivo"
+        string fingerprint UK "Fingerprint SHA256"
+        string public_key "Clave pública"
+        string private_key_encrypted "Clave privada encriptada"
+        string passphrase_encrypted "Passphrase encriptado"
+        string user_id FK "Referencia a USER"
+        string organization_id FK "Referencia a ORGANIZATION"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+        datetime last_used "Última vez usada"
+        datetime deleted_at "Soft delete"
+    }
+    
+    SESSION {
+        string id PK "UUID único"
+        string session_id UK "ID público (ssh-1, rdp-2)"
+        string connection_id FK "Referencia a CONNECTION"
+        string initiated_by_user_id FK "Referencia a USER"
+        string status "active, ended, disconnected, error"
+        datetime started_at "Inicio de sesión"
+        datetime ended_at "Fin de sesión"
+        integer duration_seconds "Duración calculada"
+        boolean is_recording "Grabación activa"
+        string recording_url "URL del video"
+        integer recording_size_bytes "Tamaño del archivo"
+        integer total_commands "Total de comandos"
+        integer safe_commands "Comandos seguros"
+        integer blocked_commands "Comandos bloqueados"
+        string client_ip "IP del cliente"
+        string user_agent "Navegador/cliente"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+    }
+    
+    SESSION_VIEWER {
+        string id PK "UUID único"
+        string session_id FK "Referencia a SESSION"
+        string user_id FK "Referencia a USER"
+        string role "owner, collaborator, viewer"
+        datetime joined_at "Momento de unión"
+        datetime left_at "Momento de salida"
+        boolean is_active "Activo en la sesión"
+        boolean can_type "Puede escribir comandos"
+        boolean can_see "Puede ver terminal"
+        boolean can_share "Puede compartir sesión"
+    }
+    
+    COMMAND {
+        string id PK "UUID único"
+        string session_id FK "Referencia a SESSION"
+        string user_id FK "Referencia a USER"
+        string command "Comando completo"
+        string command_type "shell, system, file, network, admin"
+        string status "executed, blocked, error, timeout"
+        string output "Salida del comando"
+        integer exit_code "Código de salida (0=éxito)"
+        string error_message "Mensaje de error"
+        string risk_level "low, medium, high, critical"
+        boolean was_blocked "Fue bloqueado"
+        string blocked_reason "Razón del bloqueo"
+        string policy_id FK "Referencia a POLICY"
+        datetime executed_at "Momento de ejecución"
+        integer duration_ms "Duración en milisegundos"
+        datetime created_at "Fecha de creación"
+    }
+    
+    POLICY {
+        string id PK "UUID único"
+        string name "Nombre de la política"
+        string description "Descripción de la política"
+        string organization_id FK "Referencia a ORGANIZATION"
+        boolean is_active "Política activa"
+        json applies_to_roles "Array de role_ids"
+        json applies_to_connections "Array de connection_ids"
+        json blocked_commands "Array de BlockedCommand"
+        json allowed_commands "Whitelist opcional"
+        boolean require_approval "Comandos requieren aprobación"
+        boolean auto_disconnect_on_violation "Desconectar en violación"
+        boolean notify_on_violation "Notificar en violación"
+        string created_by_user_id FK "Referencia a USER"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+    }
+    
+    BLOCKED_COMMAND {
+        string id PK "UUID único"
+        string policy_id FK "Referencia a POLICY"
+        string pattern "Regex o string exacto"
+        string pattern_type "exact, regex, contains"
+        string name "Nombre descriptivo"
+        string description "Por qué está bloqueado"
+        string severity "low, medium, high, critical"
+        json examples "Ejemplos de comandos"
+        json applies_to_types "Tipos de conexión"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+    }
+    
+    SESSION_RECORDING {
+        string id PK "UUID único"
+        string session_id FK "Referencia a SESSION"
+        string file_url "URL en storage"
+        string file_name "Nombre del archivo"
+        integer file_size_bytes "Tamaño en bytes"
+        string mime_type "video/webm, application/cast"
+        integer duration_seconds "Duración en segundos"
+        integer frames_per_second "FPS"
+        string resolution "1920x1080"
+        string codec "h264, vp9"
+        string status "processing, ready, error"
+        boolean is_downloadable "Descargable"
+        datetime retention_until "Fecha de eliminación"
+        datetime created_at "Fecha de creación"
+        datetime updated_at "Última actualización"
+    }
+    
+    AUDIT_LOG {
+        string id PK "UUID único"
+        string organization_id FK "Referencia a ORGANIZATION"
+        string user_id FK "Referencia a USER"
+        string session_id FK "Referencia a SESSION"
+        string connection_id FK "Referencia a CONNECTION"
+        string event_type "Tipo de evento"
+        string event_category "auth, connection, session, user, system"
+        string action "login, create, delete, etc"
+        string description "Descripción legible"
+        json metadata "Datos adicionales JSON"
+        string ip_address "IP de la solicitud"
+        string user_agent "User agent del cliente"
+        string status "success, failure, warning"
+        string error_message "Mensaje de error"
+        datetime timestamp "Momento del evento"
+        datetime created_at "Fecha de creación"
+    }
+
+    %% Relaciones principales
+    USER ||--o{ SESSION : "inicia/participa"
+    USER ||--o{ CONNECTION : "crea/gestiona"
+    USER ||--o{ SSH_KEY : "posee"
+    USER ||--o{ AUDIT_LOG : "genera"
+    USER }o--|| ROLE : "tiene"
+    USER }o--|| ORGANIZATION : "pertenece_a"
+    
+    CONNECTION ||--o{ SESSION : "genera"
+    CONNECTION ||--o{ AUDIT_LOG : "registra"
+    CONNECTION }o--|| SSH_KEY : "usa"
+    CONNECTION }o--|| ORGANIZATION : "pertenece_a"
+    
+    SESSION ||--o{ COMMAND : "ejecuta"
+    SESSION ||--o{ SESSION_VIEWER : "tiene"
+    SESSION ||--o{ SESSION_RECORDING : "graba"
+    SESSION ||--o{ AUDIT_LOG : "registra"
+    
+    COMMAND ||--o{ AUDIT_LOG : "registra"
+    COMMAND }o--|| POLICY : "valida_contra"
+    
+    ORGANIZATION ||--o{ POLICY : "define"
+    ORGANIZATION ||--o{ AUDIT_LOG : "contiene"
+    
+    POLICY ||--o{ BLOCKED_COMMAND : "especifica"
+    POLICY }o--o{ ROLE : "aplica_a"
+            </div>
+        </div>
+        
+        <div class="entity-info">
+            <h4>🔑 Tipos de Relaciones</h4>
+            <ul>
+                <li><code>||--o{</code> = Uno a Muchos (1:N)</li>
+                <li><code>}o--||</code> = Muchos a Uno (N:1)</li>
+                <li><code>}o--o{</code> = Muchos a Muchos (N:N)</li>
+                <li><strong>PK</strong> = Primary Key (Clave Primaria)</li>
+                <li><strong>FK</strong> = Foreign Key (Clave Foránea)</li>
+                <li><strong>UK</strong> = Unique Key (Clave Única)</li>
+            </ul>
+        </div>
+        
+        <div class="entity-info">
+            <h4>📊 Estadísticas del Sistema</h4>
+            <ul>
+                <li><strong>12 Entidades</strong> principales</li>
+                <li><strong>25+ Relaciones</strong> entre tablas</li>
+                <li><strong>150+ Atributos</strong> totales</li>
+                <li><strong>3 Roles</strong> de usuario (Admin, Technician, Observer)</li>
+                <li><strong>4 Protocolos</strong> soportados (SSH, RDP, VNC, Telnet)</li>
+                <li><strong>Auditoría completa</strong> de todas las acciones</li>
+            </ul>
+        </div>
+        
+        <div class="entity-info">
+            <h4>🔒 Características de Seguridad</h4>
+            <ul>
+                <li><strong>Zero-Trust Architecture</strong> - No confiar en nada por defecto</li>
+                <li><strong>Auditoría Completa</strong> - Registro de todas las acciones</li>
+                <li><strong>Control de Comandos</strong> - Bloqueo en tiempo real</li>
+                <li><strong>Grabación de Sesiones</strong> - Evidencia de actividades</li>
+                <li><strong>Autenticación 2FA</strong> - Doble factor opcional</li>
+                <li><strong>Roles y Permisos</strong> - Control de acceso granular</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Trident SRA</strong> - Secure Remote Access Platform</p>
+            <p>Modelo de Datos v1.0.0 | Última actualización: Octubre 2025</p>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#5bc2e7',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#4ba8d1',
+                lineColor: '#666666',
+                sectionBkgColor: '#2a2a3e',
+                altSectionBkgColor: '#1a1a2e',
+                gridColor: '#444444',
+                secondaryColor: '#2a2a3e',
+                tertiaryColor: '#1a1a2e',
+                background: '#0a0a0f',
+                mainBkg: '#1a1a2e',
+                secondBkg: '#2a2a3e',
+                tertiaryBkg: '#11111f'
+            },
+            er: {
+                fontSize: '12px',
+                fontFamily: 'Segoe UI, sans-serif'
+            }
+        });
+    </script>
+</body>
+</html>
