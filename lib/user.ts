@@ -1,4 +1,5 @@
-import { getAccessToken } from "./auth"
+import { api } from "./axios"
+
 export interface User {
   id: string
   name: string
@@ -26,22 +27,8 @@ export interface UpdateUser extends Partial<CreateUser> {
 
 export const getCurrentUser = async (): Promise<User> => {
   try {
-    const access_token = getAccessToken()
-    if (!access_token) {
-      throw new Error("No access token available")
-    }
-    const response = await fetch("http://localhost:8000/api/v1/users/me/profile", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${access_token}`
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to get current user")
-    }
-    const data = await response.json()
-    return data as User
+    const response = await api.get<User>('/api/v1/users/me/profile')
+    return response.data
   } catch (error) {
     console.error(error)
     throw error
@@ -50,22 +37,8 @@ export const getCurrentUser = async (): Promise<User> => {
 
 export const getUser = async (): Promise<User[]> => {
   try {
-    const access_token = getAccessToken()
-    if (!access_token) {
-      throw new Error("No access token available")
-    }
-    const response = await fetch("http://localhost:8000/api/v1/users", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${access_token}`
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to get users")
-    }
-    const data = await response.json()
-    return data
+    const response = await api.get<User[]>('/api/v1/users')
+    return response.data
   } catch (error) {
     console.error(error)
     throw error
@@ -74,23 +47,8 @@ export const getUser = async (): Promise<User[]> => {
 
 export const createUser = async (user: CreateUser): Promise<User> => {
   try {
-    const access_token = getAccessToken()
-    if (!access_token) {
-      throw new Error("No access token available")
-    }
-    const response = await fetch("http://localhost:8000/api/v1/users", {
-      method: "POST",
-      body: JSON.stringify(user),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${access_token}`
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to create user")
-    }
-    const data = await response.json()
-    return data as User
+    const response = await api.post<User>('/api/v1/users', user)
+    return response.data
   } catch (error) {
     console.error(error)
     throw error
@@ -99,24 +57,9 @@ export const createUser = async (user: CreateUser): Promise<User> => {
 
 export const updateUser = async (user: UpdateUser): Promise<User> => {
   try {
-    const access_token = getAccessToken()
     const { id, ...rest } = user
-    if (!access_token) {
-      throw new Error("No access token available")
-    }
-    const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(rest),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${access_token}`
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to update user")
-    }
-    const data = await response.json()
-    return data as User
+    const response = await api.put<User>(`/api/v1/users/${id}`, rest)
+    return response.data
   } catch (error) {
     console.error(error)
     throw error
@@ -125,20 +68,7 @@ export const updateUser = async (user: UpdateUser): Promise<User> => {
 
 export const deleteUser = async (id: string): Promise<void> => {
   try {
-    const access_token = getAccessToken()
-    if (!access_token) {
-      throw new Error("No access token available")
-    }
-    const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${access_token}`
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to delete user")
-    }
+    await api.delete(`/api/v1/users/${id}`)
   } catch (error) {
     console.error(error)
     throw error

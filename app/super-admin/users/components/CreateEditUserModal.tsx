@@ -42,6 +42,7 @@ export default function CreateEditUserModal({ isOpen, setIsOpen, roles, organiza
     mutationFn: createUser,
     onSuccess: () => {
       setIsOpen(false)
+      setForm(INITIAL_FORM)
       queryClient.invalidateQueries({
         queryKey: ["users"]
       })
@@ -51,6 +52,7 @@ export default function CreateEditUserModal({ isOpen, setIsOpen, roles, organiza
     mutationFn: updateUser,
     onSuccess: () => {
       setIsOpen(false)
+      setForm(INITIAL_FORM)
       queryClient.invalidateQueries({
         queryKey: ["users"]
       })

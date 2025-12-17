@@ -1,4 +1,4 @@
-import { getAccessToken } from "./auth"
+import { api } from "./axios"
 
 type Permission = "create" | "read" | "update" | "delete"
 
@@ -20,22 +20,8 @@ export interface Role {
 
 export const getRoles = async (): Promise<Role[]> => {
   try {
-    const access_token = getAccessToken()
-    if (!access_token) {
-      throw new Error("No access token available")
-    }
-    const response = await fetch("http://localhost:8000/api/v1/roles", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${access_token}`
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to get roles")
-    }
-    const data = await response.json()
-    return data
+    const response = await api.get<Role[]>('/api/v1/roles')
+    return response.data
   } catch (error) {
     console.error(error)
     throw error

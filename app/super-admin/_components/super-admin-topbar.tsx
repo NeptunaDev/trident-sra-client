@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/user"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { LogOut } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuthStore } from "@/store/authStore"
 
 function useDebouncedValue(value: string, delayMs: number) {
   const [debounced, setDebounced] = useState(value)
@@ -31,6 +33,7 @@ export function SuperAdminTopbar() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const logout = useAuthStore((state) => state.logout)
 
   const initialQ = searchParams.get("q") ?? ""
   const [q, setQ] = useState(initialQ)
@@ -126,6 +129,14 @@ export function SuperAdminTopbar() {
               className="hover:bg-[#5bc2e7] hover:text-[#11111f] text-white focus:bg-[#5bc2e7] focus:text-[#11111f] data-[highlighted]:bg-[#5bc2e7] data-[highlighted]:text-[#11111f]"
             >
               Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-[rgba(91,194,231,0.2)]" />
+            <DropdownMenuItem
+              onClick={logout}
+              className="hover:bg-[#ff6b6b] hover:text-white text-white focus:bg-[#ff6b6b] focus:text-white data-[highlighted]:bg-[#ff6b6b] data-[highlighted]:text-white"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

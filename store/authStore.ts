@@ -13,6 +13,7 @@ export type AuthState = {
   roleName: string | null
   accessToken: string | null
   refreshToken: string | null
+  isAuthenticated: boolean
 
   setSession: (payload: {
     user?: AuthUser | null
@@ -20,16 +21,19 @@ export type AuthState = {
     accessToken: string
     refreshToken: string
   }) => void
+  setTokens: (accessToken: string, refreshToken: string) => void
   clearSession: () => void
+  logout: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       roleName: null,
       accessToken: null,
       refreshToken: null,
+      isAuthenticated: false,
 
       setSession: ({ user, roleName, accessToken, refreshToken }) =>
         set({
@@ -37,6 +41,14 @@ export const useAuthStore = create<AuthState>()(
           roleName: roleName ?? null,
           accessToken,
           refreshToken,
+          isAuthenticated: !!accessToken,
+        }),
+
+      setTokens: (accessToken, refreshToken) =>
+        set({
+          accessToken,
+          refreshToken,
+          isAuthenticated: !!accessToken,
         }),
 
       clearSession: () =>
@@ -45,7 +57,26 @@ export const useAuthStore = create<AuthState>()(
           roleName: null,
           accessToken: null,
           refreshToken: null,
+          isAuthenticated: false,
         }),
+
+      logout: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-storage')
+        }
+        
+        set({
+          user: null,
+          roleName: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+        })
+        
+        if (typeof window !== 'undefined') {
+          window.location.href = '/'
+        }
+      },
     }),
     {
       name: "auth-storage",
