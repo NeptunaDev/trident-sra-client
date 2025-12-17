@@ -67,6 +67,14 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`
     }
     
+    // Log en desarrollo para debugging
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      const fullURL = config.baseURL && config.url 
+        ? `${config.baseURL}${config.url}` 
+        : config.url || 'N/A'
+      console.log(`[Axios Request] ${config.method?.toUpperCase()} ${fullURL}`)
+    }
+    
     return config
   },
   (error: AxiosError) => {
@@ -79,6 +87,20 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean
+    }
+
+    // Si es un error de red (sin respuesta del servidor), rechazar inmediatamente
+    if (!error.response) {
+      if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.error('Network Error:', {
+          message: error.message,
+          code: error.code,
+          url: originalRequest?.url,
+          baseURL: getBaseURL(),
+          fullURL: originalRequest ? `${getBaseURL()}${originalRequest.url}` : 'N/A'
+        })
+      }
+      return Promise.reject(error)
     }
 
     if (error.response?.status !== 401 || !originalRequest) {
