@@ -7,21 +7,20 @@ import { StatusBadge } from "@/components/status-badge"
 import { Server, Activity, Terminal, Clock, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { getCurrentUser } from "@/lib/auth"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
+import { useQuery } from "@tanstack/react-query"
+import { getCurrentUser } from "@/lib/user"
 
 export default function DashboardPage() {
   const router = useRouter()
   const [lang, setLang] = useState<Language>("en")
-  const [userName, setUserName] = useState("User")
+
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: getCurrentUser
+  })
 
   useEffect(() => {
-    const user = getCurrentUser()
-    if (!user) {
-      router.push("/login")
-      return
-    }
-    setUserName(user.name)
     setLang(getLanguage())
   }, [router])
 
@@ -80,7 +79,7 @@ export default function DashboardPage() {
       {/* Welcome */}
       <div>
         <h1 className="text-3xl font-bold mb-2 text-white">
-          {t.welcome_back}, {userName}!
+          {t.welcome_back}, {currentUser?.name}!
         </h1>
         <p className="text-[#c0c5ce]">{t.whats_happening}</p>
       </div>
