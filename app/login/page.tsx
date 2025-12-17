@@ -13,33 +13,71 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Circle } from "lucide-react"
 import Link from "next/link"
-import { login } from "@/lib/auth"
+import { Login, login, TokenPayload } from "@/lib/auth"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
+import { useMutation } from "@tanstack/react-query"
+import { jwtDecode } from "jwt-decode"
+import { useloadingStore } from "@/store/loadingStore"
+import { useAuthStore } from "@/store/authStore"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
   const [lang, setLang] = useState<Language>("en")
+  const t = translations[lang]
+  const { isLoading, setIsLoading } = useloadingStore()
+  const setSession = useAuthStore((s) => s.setSession)
+
+  const router = useRouter()
+  const [form, setForm] = useState<Login>({
+    email: "",
+    password: "",
+  })
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      const { access_token, refresh_token } = data
+      const accessTokenDecode = jwtDecode<TokenPayload>(access_token)
+      const roleName = accessTokenDecode.role_name
+      setSession({
+        roleName,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        user: { email: form.email },
+      })
+      if (roleName === "super_admin") {
+        router.push("/super-admin/dashboard")
+        return
+      }
+      router.push("/dashboard")
+    },
+    onError: (error) => {
+      console.error(error)
+    },
+  })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    // TODO: Validaciones del formulario
+    mutate(form)
+  }
 
   useEffect(() => {
     setLang(getLanguage())
   }, [])
 
-  const t = translations[lang]
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-
-    const user = login(email, password)
-    if (user) {
-      router.push("/dashboard")
-    } else {
-      setError(lang === "en" ? "Invalid credentials" : "Credenciales inválidas")
+  useEffect(() => {
+    if (isPending !== isLoading) {
+      setIsLoading(isPending)
     }
-  }
+  }, [isPending])
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
@@ -62,13 +100,6 @@ export default function LoginPage() {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Error Message */}
-            {error && (
-              <div className="p-3 rounded-lg bg-[#ff6b6b]/10 border border-[#ff6b6b] text-[#ff6b6b] text-sm">
-                {error}
-              </div>
-            )}
-
             {/* Email Input */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-white">
@@ -77,9 +108,10 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                name="email"
                 placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={form.email}
+                onChange={handleChange}
                 className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] font-mono text-white"
                 required
               />
@@ -93,9 +125,10 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                name="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={form.password}
+                onChange={handleChange}
                 className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                 required
               />

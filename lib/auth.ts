@@ -1,41 +1,50 @@
-export interface User {
-  id: string
+export interface Login {
   email: string
-  name: string
-  role: "admin" | "user" | "viewer"
-  avatar?: string
+  password: string
 }
 
-export function login(email: string, password: string): User | null {
-  // Accept any email/password for demo purposes
-  if (email && password) {
-    const user: User = {
-      id: "1",
-      email,
-      name: email.split("@")[0],
-      role: "admin",
-    }
-    localStorage.setItem("trident_user", JSON.stringify(user))
-    return user
-  }
-  return null
+export interface TokenPayload {
+  role_name: string
 }
 
-export function logout(): void {
-  localStorage.removeItem("trident_user")
+export interface LoginResponse {
+  access_token: string
+  refresh_token: string
+  token_type: string
 }
 
-export function getCurrentUser(): User | null {
+/**
+ * Helper to get access token from auth store (localStorage)
+ * This reads directly from localStorage to avoid needing hooks in async functions
+ */
+export const getAccessToken = (): string | null => {
   if (typeof window === "undefined") return null
-  const userStr = localStorage.getItem("trident_user")
-  if (!userStr) return null
   try {
-    return JSON.parse(userStr)
+    const stored = localStorage.getItem("auth-storage")
+    if (!stored) return null
+    const parsed = JSON.parse(stored)
+    return parsed?.state?.accessToken ?? null
   } catch {
     return null
   }
 }
 
-export function isAuthenticated(): boolean {
-  return getCurrentUser() !== null
+export const login = async (login: Login): Promise<LoginResponse> => {
+  try {
+    const response = await fetch("http://localhost:8000/api/v1/auth/login", {
+      method: "POST",
+      body: JSON.stringify(login),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    if (!response.ok) {
+      throw new Error("Failed to login")
+    }
+    const data = await response.json()
+    return data as LoginResponse
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
 }
