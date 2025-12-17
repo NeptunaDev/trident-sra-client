@@ -1,20 +1,25 @@
 'use  client'
 import { useEffect, useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+
+import { createUser, CreateUser, updateUser, User } from "@/lib/user"
+import { Role } from "@/lib/role"
+import { Organization } from "@/lib/organization"
+
+import { useloadingStore } from "@/store/loadingStore"
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createUser, CreateUser } from "@/lib/user"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getRoles } from "@/lib/role"
 import { SelectSearch } from "@/components/ui/select-search"
-import { getOrganizations } from "@/lib/organization"
-import { useloadingStore } from "@/store/loadingStore"
 
 interface CreateEditUserModalProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
+  roles: Role[]
+  organizations: Organization[]
+  editingUser: User | null
 }
 
 const INITIAL_FORM: CreateUser = {
@@ -25,25 +30,26 @@ const INITIAL_FORM: CreateUser = {
   organization_id: "",
 }
 
-export default function CreateEditUserModal({ isOpen, setIsOpen }: CreateEditUserModalProps) {
+export default function CreateEditUserModal({ isOpen, setIsOpen, roles, organizations, editingUser }: CreateEditUserModalProps) {
+  const isEditng = !!editingUser
   const [disabled, setDisabled] = useState(false)
   const [form, setForm] = useState<CreateUser>(INITIAL_FORM)
 
   const { isLoading, setIsLoading } = useloadingStore()
   const queryClient = useQueryClient()
 
-  const { data: roles } = useQuery({
-    queryKey: ["roles"],
-    queryFn: getRoles
-  })
-  const { data: organizations } = useQuery({
-    queryKey: ["organizations"],
-    queryFn: getOrganizations
-  })
   const { mutate, isPending } = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
-      setForm(INITIAL_FORM)
+      setIsOpen(false)
+      queryClient.invalidateQueries({
+        queryKey: ["users"]
+      })
+    }
+  })
+  const { mutate: updateMutate, isPending: isUpdatePending } = useMutation({
+    mutationFn: updateUser,
+    onSuccess: () => {
       setIsOpen(false)
       queryClient.invalidateQueries({
         queryKey: ["users"]
@@ -61,9 +67,19 @@ export default function CreateEditUserModal({ isOpen, setIsOpen }: CreateEditUse
 
   const handleSave = () => {
     // TODO: Validacion del formulario
+    if (isEditng) {
+      updateMutate({
+        id: editingUser?.id ?? "",
+        ...(form.password.trim() !== "" ? { password: form.password } : {}),
+        ...(form.name !== editingUser.name ? { name: form.name } : {}),
+        ...(form.email !== editingUser.email ? { email: form.email } : {}),
+        ...(form.organization_id !== editingUser.organization_id ? { organization_id: form.organization_id } : {}),
+        ...(form.role_id !== editingUser.role_id ? { role_id: form.role_id } : {}),
+      })
+      return
+    }
     mutate(form)
   }
-
 
   // Managment the state the disabled
   useEffect(() => {
@@ -76,17 +92,33 @@ export default function CreateEditUserModal({ isOpen, setIsOpen }: CreateEditUse
     setDisabled(false)
   }, [form])
 
+  // Managment the state the loading
   useEffect(() => {
-    if (isPending !== isLoading) {
-      setIsLoading(isPending)
+    if (isPending !== isLoading || isUpdatePending !== isLoading) {
+      setIsLoading(isPending || isUpdatePending)
     }
-  }, [isPending])
+  }, [isPending, isUpdatePending])
+
+  // Managment the state the editing user
+  useEffect(() => {
+    if (!isEditng) {
+      setForm(INITIAL_FORM)
+      return
+    }
+    setForm({
+      name: editingUser?.name ?? "",
+      email: editingUser?.email ?? "",
+      password: "",
+      role_id: editingUser?.role_id ?? "",
+      organization_id: editingUser?.organization_id ?? "",
+    })
+  }, [editingUser, isEditng])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">{"Create"} User</DialogTitle>
+          <DialogTitle className="text-white">{isEditng ? "Edit" : "Create"} User</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -147,7 +179,7 @@ export default function CreateEditUserModal({ isOpen, setIsOpen }: CreateEditUse
             disabled={disabled}
             className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
           >
-            Save
+            {isEditng ? "Update" : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

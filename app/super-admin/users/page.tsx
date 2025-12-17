@@ -1,35 +1,77 @@
 "use client"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+
+import { useEffect, useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Pencil, Plus, Trash2 } from "lucide-react"
+
+import { getRoles } from "@/lib/role"
+import { getOrganizations } from "@/lib/organization"
+import { formatDate } from "@/lib/utils"
+import { deleteUser, getUser, User } from "@/lib/user"
+
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { useQuery } from "@tanstack/react-query"
-import { getUser } from "@/lib/user"
+import { AlertDialog } from "@/components/ui/alert-dialog"
 import CreateEditUserModal from "./components/CreateEditUserModal"
+import { useloadingStore } from "@/store/loadingStore"
+
 
 export default function UsersCrudPage() {
   const [isOpen, setIsOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [deletingUser, setDeletingUser] = useState<User | null>(null)
+  const queryClient = useQueryClient()
+  const { isLoading, setIsLoading } = useloadingStore()
 
   const { data: users } = useQuery({
     queryKey: ["users"],
     queryFn: getUser
   })
+  const { data: roles } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getRoles
+  })
+  const { data: organizations } = useQuery({
+    queryKey: ["organizations"],
+    queryFn: getOrganizations
+  })
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["users"]
+      })
+      setShowDeleteDialog(false)
+      setDeletingUser(null)
+    }
+  })
+
+  const handleOpenDialog = () => {
+    setEditingUser(null)
+    setIsOpen(true)
+  }
 
   const confirmDelete = () => {
-    console.log("confirm delete")
+    mutate(deletingUser?.id ?? "")
   }
 
-  const openEdit = (it: any) => {
-    console.log("open edit", it)
+  const handleEdit = (it: User) => {
+    setEditingUser(it)
+    setIsOpen(true)
   }
 
-  const requestDelete = (id: string) => {
-    console.log("request delete", id)
+  const handleDelete = (it: User) => {
+    setDeletingUser(it)
+    setShowDeleteDialog(true)
   }
+
+  // Managment the state the loading
+  useEffect(() => {
+    if (isPending !== isLoading) {
+      setIsLoading(isPending)
+    }
+  }, [isPending])
 
   return (
     <div className="space-y-4">
@@ -39,7 +81,7 @@ export default function UsersCrudPage() {
           <p className="text-sm text-[#c0c5ce]">Create, update and delete users.</p>
         </div>
         <Button
-          onClick={() => setIsOpen(true)}
+          onClick={handleOpenDialog}
           className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -71,18 +113,18 @@ export default function UsersCrudPage() {
               ) : (
                 users?.map((it) => (
                   <tr key={it.id} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
-                    <td className="py-3 px-4 text-white font-medium">{it.id}</td>
+                    <td className="py-3 px-4 text-white font-medium">{it.id.split("-")[0]}</td>
                     <td className="py-3 px-4 text-white font-medium">{it.name}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.email}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.organization_id || "Super Admin"}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.role_id}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.created_at}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{organizations?.find((organization) => organization.id === it.organization_id)?.name || "-"}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{roles?.find((role) => role.id === it.role_id)?.display_name}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.created_at)}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => openEdit(it)}
+                          onClick={() => handleEdit(it)}
                           className="text-white hover:text-[#5bc2e7] hover:bg-[#0f0f1c]"
                         >
                           <Pencil className="w-4 h-4 mr-2" />
@@ -91,7 +133,7 @@ export default function UsersCrudPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => requestDelete(it.id)}
+                          onClick={() => handleDelete(it)}
                           className="text-white hover:text-white hover:bg-[#ff6b6b]"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -107,24 +149,20 @@ export default function UsersCrudPage() {
         </div>
       </Card>
 
-      <CreateEditUserModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <CreateEditUserModal isOpen={isOpen} setIsOpen={setIsOpen} roles={roles ?? []} organizations={organizations ?? []} editingUser={editingUser} />
 
-      <Dialog open={!!deleteId} onOpenChange={(open) => (!open ? setDeleteId(null) : null)}>
-        <DialogContent className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] text-white">
-          <DialogHeader>
-            <DialogTitle className="text-white">Confirm delete</DialogTitle>
-          </DialogHeader>
-          <div className="text-[#c0c5ce]">This action cannot be undone.</div>
-          <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={() => setDeleteId(null)} className="text-white hover:bg-[#11111f]">
-              Cancel
-            </Button>
-            <Button onClick={confirmDelete} className="bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-semibold">
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title={"Confirm delete"}
+        description={
+          `¿Estás seguro de que deseas eliminar el usuario "${deletingUser?.name}"? Esta acción no se puede deshacer.`
+        }
+        confirmText={"Delete"}
+        cancelText={"Cancel"}
+        variant="destructive"
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import { getAccessToken } from "./auth"
+
 type Permission = "create" | "read" | "update" | "delete"
 
 interface Permissions {
@@ -18,7 +20,10 @@ export interface Role {
 
 export const getRoles = async (): Promise<Role[]> => {
   try {
-    const access_token = localStorage.getItem("access_token")
+    const access_token = getAccessToken()
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
     const response = await fetch("http://localhost:8000/api/v1/roles", {
       method: "GET",
       headers: {

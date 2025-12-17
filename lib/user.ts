@@ -1,3 +1,4 @@
+import { getAccessToken } from "./auth"
 export interface User {
   id: string
   name: string
@@ -18,9 +19,17 @@ export interface CreateUser {
   organization_id: string
 }
 
+export interface UpdateUser extends Partial<CreateUser> {
+  id: string
+  is_active?: boolean
+}
+
 export const getCurrentUser = async (): Promise<User> => {
   try {
-    const access_token = localStorage.getItem("access_token")
+    const access_token = getAccessToken()
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
     const response = await fetch("http://localhost:8000/api/v1/users/me/profile", {
       method: "GET",
       headers: {
@@ -41,7 +50,10 @@ export const getCurrentUser = async (): Promise<User> => {
 
 export const getUser = async (): Promise<User[]> => {
   try {
-    const access_token = localStorage.getItem("access_token")
+    const access_token = getAccessToken()
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
     const response = await fetch("http://localhost:8000/api/v1/users", {
       method: "GET",
       headers: {
@@ -62,7 +74,10 @@ export const getUser = async (): Promise<User[]> => {
 
 export const createUser = async (user: CreateUser): Promise<User> => {
   try {
-    const access_token = localStorage.getItem("access_token")
+    const access_token = getAccessToken()
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
     const response = await fetch("http://localhost:8000/api/v1/users", {
       method: "POST",
       body: JSON.stringify(user),
@@ -76,6 +91,54 @@ export const createUser = async (user: CreateUser): Promise<User> => {
     }
     const data = await response.json()
     return data as User
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const updateUser = async (user: UpdateUser): Promise<User> => {
+  try {
+    const access_token = getAccessToken()
+    const { id, ...rest } = user
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
+    const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(rest),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${access_token}`
+      },
+    })
+    if (!response.ok) {
+      throw new Error("Failed to update user")
+    }
+    const data = await response.json()
+    return data as User
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const deleteUser = async (id: string): Promise<void> => {
+  try {
+    const access_token = getAccessToken()
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
+    const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${access_token}`
+      },
+    })
+    if (!response.ok) {
+      throw new Error("Failed to delete user")
+    }
   } catch (error) {
     console.error(error)
     throw error

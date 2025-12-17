@@ -1,3 +1,4 @@
+import { getAccessToken } from "./auth"
 export interface Organization {
   id: string,
   name: string,
@@ -13,7 +14,10 @@ export interface Organization {
 
 export const getOrganizations = async (): Promise<Organization[]> => {
   try {
-    const access_token = localStorage.getItem("access_token")
+    const access_token = getAccessToken()
+    if (!access_token) {
+      throw new Error("No access token available")
+    }
     const response = await fetch("http://localhost:8000/api/v1/organizations", {
       method: "GET",
       headers: {

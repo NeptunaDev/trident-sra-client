@@ -18,11 +18,13 @@ import { translations, getLanguage, type Language } from "@/lib/i18n"
 import { useMutation } from "@tanstack/react-query"
 import { jwtDecode } from "jwt-decode"
 import { useloadingStore } from "@/store/loadingStore"
+import { useAuthStore } from "@/store/authStore"
 
 export default function LoginPage() {
   const [lang, setLang] = useState<Language>("en")
   const t = translations[lang]
   const { isLoading, setIsLoading } = useloadingStore()
+  const setSession = useAuthStore((s) => s.setSession)
 
   const router = useRouter()
   const [form, setForm] = useState<Login>({
@@ -35,9 +37,13 @@ export default function LoginPage() {
     onSuccess: (data) => {
       const { access_token, refresh_token } = data
       const accessTokenDecode = jwtDecode<TokenPayload>(access_token)
-      localStorage.setItem("access_token", access_token)
-      localStorage.setItem("refresh_token", refresh_token)
       const roleName = accessTokenDecode.role_name
+      setSession({
+        roleName,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        user: { email: form.email },
+      })
       if (roleName === "super_admin") {
         router.push("/super-admin/dashboard")
         return

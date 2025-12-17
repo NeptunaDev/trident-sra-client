@@ -13,6 +13,22 @@ export interface LoginResponse {
   token_type: string
 }
 
+/**
+ * Helper to get access token from auth store (localStorage)
+ * This reads directly from localStorage to avoid needing hooks in async functions
+ */
+export const getAccessToken = (): string | null => {
+  if (typeof window === "undefined") return null
+  try {
+    const stored = localStorage.getItem("auth-storage")
+    if (!stored) return null
+    const parsed = JSON.parse(stored)
+    return parsed?.state?.accessToken ?? null
+  } catch {
+    return null
+  }
+}
+
 export const login = async (login: Login): Promise<LoginResponse> => {
   try {
     const response = await fetch("http://localhost:8000/api/v1/auth/login", {
