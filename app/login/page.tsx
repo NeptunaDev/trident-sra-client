@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { WaveBackground } from "@/components/wave-background"
 import { TridentLogo } from "@/components/trident-logo"
 import { LanguageSwitcher } from "@/components/language-switcher"
@@ -19,15 +18,13 @@ import { useMutation } from "@tanstack/react-query"
 import { jwtDecode } from "jwt-decode"
 import { useloadingStore } from "@/store/loadingStore"
 import { useAuthStore } from "@/store/authStore"
+import { RouteGuard } from "@/components/route-guard"
 
 export default function LoginPage() {
   const [lang, setLang] = useState<Language>("en")
   const t = translations[lang]
   const { isLoading, setIsLoading } = useloadingStore()
   const setSession = useAuthStore((s) => s.setSession)
-  const { isAuthenticated, roleName } = useAuthStore()
-
-  const router = useRouter()
   const [form, setForm] = useState<Login>({
     email: "",
     password: "",
@@ -46,25 +43,6 @@ export default function LoginPage() {
         refreshToken: refresh_token,
         user: { email: form.email },
       })
-      
-      const authData = {
-        state: {
-          user: { email: form.email },
-          roleName,
-          accessToken: access_token,
-          refreshToken: refresh_token,
-        },
-        version: 0,
-      }
-      localStorage.setItem('auth-storage', JSON.stringify(authData))
-      
-      setTimeout(() => {
-        if (roleName === "super_admin") {
-          window.location.href = "/super-admin/dashboard"
-        } else {
-          window.location.href = "/dashboard"
-        }
-      }, 50)
     },
     onError: (error: Error) => {
       console.error("Login error:", error)
@@ -89,23 +67,14 @@ export default function LoginPage() {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) {
-      if (roleName === "super_admin") {
-        router.replace("/super-admin/dashboard")
-      } else {
-        router.replace("/dashboard")
-      }
-    }
-  }, [isAuthenticated, roleName, router])
-
-  useEffect(() => {
     if (isPending !== isLoading) {
       setIsLoading(isPending)
     }
   }, [isPending])
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
+    <RouteGuard requireGuest>
+      <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
       <WaveBackground />
 
       <div className="absolute top-4 right-4 z-20">
@@ -190,5 +159,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </RouteGuard>
   )
 }

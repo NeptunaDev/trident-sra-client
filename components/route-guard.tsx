@@ -14,22 +14,14 @@ interface RouteGuardProps {
 const getAuthFromStorage = () => {
   if (typeof window === "undefined") return { isAuthenticated: false, roleName: null, accessToken: null }
   
-  try {
-    const stored = localStorage.getItem("auth-storage")
-    if (!stored) return { isAuthenticated: false, roleName: null, accessToken: null }
-    
-    const parsed = JSON.parse(stored)
-    const state = parsed?.state || {}
-    const accessToken = state.accessToken
-    const roleName = state.roleName
-    
-    return {
-      isAuthenticated: !!accessToken,
-      roleName: roleName || null,
-      accessToken: accessToken || null,
-    }
-  } catch {
-    return { isAuthenticated: false, roleName: null, accessToken: null }
+  const state = useAuthStore.getState()
+  const accessToken = state.accessToken
+  const roleName = state.roleName
+  
+  return {
+    isAuthenticated: !!accessToken,
+    roleName: roleName || null,
+    accessToken: accessToken || null,
   }
 }
 
@@ -60,7 +52,7 @@ export function RouteGuard({
     }
 
     updateState()
-    const interval = setInterval(updateState, 100)
+    const interval = setInterval(updateState, 50)
     return () => clearInterval(interval)
   }, [storeAccessToken, storeRoleName])
 
