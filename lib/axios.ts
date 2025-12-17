@@ -22,13 +22,16 @@ const getBaseURL = (): string => {
       cleanUrl = `http://${cleanUrl}`
     }
     
+    // Remover /api/v1 si está presente, ya que las rutas lo incluirán explícitamente
+    cleanUrl = cleanUrl.replace(/\/api\/v1\/?$/, '')
+    
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
       console.log('API Base URL:', cleanUrl)
     }
     
     return cleanUrl
   }
-  return 'http://localhost:8000/api/v1'
+  return 'http://localhost:8000'
 }
 
 export const api = axios.create({
@@ -83,7 +86,8 @@ api.interceptors.response.use(
     }
 
     if (originalRequest._retry) {
-      useAuthStore.getState().logout()
+      const authStore = useAuthStore.getState()
+      authStore.logout()
       return Promise.reject(error)
     }
 
@@ -106,15 +110,21 @@ api.interceptors.response.use(
     isRefreshing = true
 
     try {
-      const refreshToken = useAuthStore.getState().refreshToken
+      const authStore = useAuthStore.getState()
+      const refreshToken = authStore.refreshToken
       
       if (!refreshToken) {
-        throw new Error('No refresh token available')
+        isRefreshing = false
+        processQueue(error, null)
+        authStore.logout()
+        return Promise.reject(error)
       }
 
       const baseURL = getBaseURL()
+      // La ruta debe incluir /api/v1 completo
+      // El refresh_token debe ir en el body según la API
       const response = await axios.post(
-        `${baseURL}/auth/refresh`,
+        `${baseURL}/api/v1/auth/refresh`,
         { refresh_token: refreshToken },
         {
           headers: {
@@ -123,9 +133,15 @@ api.interceptors.response.use(
         }
       )
 
-      const { access_token: newAccessToken, refresh_token: newRefreshToken } = response.data
+      const responseData = response.data
+      const newAccessToken = responseData?.access_token || responseData?.accessToken
+      const newRefreshToken = responseData?.refresh_token || responseData?.refreshToken
 
-      useAuthStore.getState().setTokens(newAccessToken, newRefreshToken)
+      if (!newAccessToken || !newRefreshToken) {
+        throw new Error('Invalid refresh response: missing tokens')
+      }
+
+      authStore.setTokens(newAccessToken, newRefreshToken)
 
       if (originalRequest.headers) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
@@ -135,10 +151,12 @@ api.interceptors.response.use(
       isRefreshing = false
 
       return api(originalRequest)
-    } catch (refreshError) {
-      processQueue(refreshError as AxiosError, null)
+    } catch (refreshError: any) {
       isRefreshing = false
-      useAuthStore.getState().logout()
+      processQueue(refreshError, null)
+      
+      const authStore = useAuthStore.getState()
+      authStore.logout()
       
       return Promise.reject(refreshError)
     }
