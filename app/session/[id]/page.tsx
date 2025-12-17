@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { ArrowLeft, Circle, Share2, StopCircle, Users, TerminalIcon, Monitor, Eye, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { RouteGuard } from "@/components/route-guard"
 
 export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const [isRecording, setIsRecording] = useState(true)
@@ -123,7 +124,8 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const terminalOutput = connectionInfo.terminalOutput
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+    <RouteGuard requireAuth>
+      <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
       {/* Header */}
       <header className="h-16 border-b border-[#5bc2e7] bg-[#1a1a2e] flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
@@ -272,6 +274,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           </Button>
         </aside>
       </div>
-    </div>
+      </div>
+    </RouteGuard>
   )
 }

@@ -1,3 +1,5 @@
+import { api } from './axios'
+
 export interface Login {
   email: string
   password: string
@@ -29,20 +31,10 @@ export const getAccessToken = (): string | null => {
   }
 }
 
-export const login = async (login: Login): Promise<LoginResponse> => {
+export const login = async (loginData: Login): Promise<LoginResponse> => {
   try {
-    const response = await fetch("http://localhost:8000/api/v1/auth/login", {
-      method: "POST",
-      body: JSON.stringify(login),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    if (!response.ok) {
-      throw new Error("Failed to login")
-    }
-    const data = await response.json()
-    return data as LoginResponse
+    const response = await api.post<LoginResponse>('/api/v1/auth/login', loginData)
+    return response.data
   } catch (error) {
     console.error(error)
     throw error

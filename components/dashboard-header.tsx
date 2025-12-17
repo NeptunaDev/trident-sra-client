@@ -19,12 +19,14 @@ import { LanguageSwitcher } from "./language-switcher"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
 import { useQuery } from "@tanstack/react-query"
 import { getCurrentUser } from "@/lib/user"
+import { useAuthStore } from "@/store/authStore"
 
 export function DashboardHeader() {
   const router = useRouter()
   const [showNewConnection, setShowNewConnection] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [lang, setLang] = useState<Language>("en")
+  const logout = useAuthStore((state) => state.logout)
 
   // TODO: Usar is loading
   const { data: currentUser } = useQuery({
@@ -35,8 +37,7 @@ export function DashboardHeader() {
   const t = translations[lang]
 
   const handleLogout = () => {
-    // logout()
-    router.push("/login")
+    logout()
   }
 
   const handleProfileClick = () => {
