@@ -3,6 +3,10 @@ export interface Login {
   password: string
 }
 
+export interface TokenPayload {
+  role_name: string
+}
+
 export interface LoginResponse {
   access_token: string
   refresh_token: string

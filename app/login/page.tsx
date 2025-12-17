@@ -13,14 +13,16 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Circle } from "lucide-react"
 import Link from "next/link"
-import { Login, login } from "@/lib/auth"
+import { Login, login, TokenPayload } from "@/lib/auth"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
 import { useMutation } from "@tanstack/react-query"
 import { jwtDecode } from "jwt-decode"
+import { useloadingStore } from "@/store/loadingStore"
 
 export default function LoginPage() {
   const [lang, setLang] = useState<Language>("en")
   const t = translations[lang]
+  const { isLoading, setIsLoading } = useloadingStore()
 
   const router = useRouter()
   const [form, setForm] = useState<Login>({
@@ -32,11 +34,15 @@ export default function LoginPage() {
     mutationFn: login,
     onSuccess: (data) => {
       const { access_token, refresh_token } = data
-      const accessTokenDecode = jwtDecode(access_token)
-      console.log(accessTokenDecode)
+      const accessTokenDecode = jwtDecode<TokenPayload>(access_token)
       localStorage.setItem("access_token", access_token)
       localStorage.setItem("refresh_token", refresh_token)
-      // router.push("/dashboard")
+      const roleName = accessTokenDecode.role_name
+      if (roleName === "super_admin") {
+        router.push("/super-admin/dashboard")
+        return
+      }
+      router.push("/dashboard")
     },
     onError: (error) => {
       console.error(error)
@@ -60,6 +66,12 @@ export default function LoginPage() {
   useEffect(() => {
     setLang(getLanguage())
   }, [])
+
+  useEffect(() => {
+    if (isPending !== isLoading) {
+      setIsLoading(isPending)
+    }
+  }, [isPending])
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
