@@ -96,20 +96,16 @@ export default function CreateEditSessionModal({ isOpen, setIsOpen, editingSessi
                 id: editingSession?.id ?? "",
                 ...(form.recording_enabled !== editingSession.recording_enabled ? { recording_enabled: form.recording_enabled } : {}),
                 ...(form.status !== editingSession.status ? { status: form.status } : {}),
-                ...(form.duration_seconds !== editingSession.duration_seconds ? { duration_seconds: Number(form.duration_seconds) } : {}),
+                ...(form.duration_seconds !== editingSession.duration_seconds ? { duration_seconds: form.duration_seconds } : {}),
                 ...(form.recording_url !== editingSession.recording_url ? { recording_url: form.recording_url } : {}),
-                ...(form.total_commands !== editingSession.total_commands ? { total_commands: Number(form.total_commands) } : {}),
-                ...(form.blocked_commands !== editingSession.blocked_commands ? { blocked_commands: Number(form.blocked_commands) } : {}),
+                ...(form.total_commands !== editingSession.total_commands ? { total_commands: form.total_commands } : {}),
+                ...(form.blocked_commands !== editingSession.blocked_commands ? { blocked_commands: form.blocked_commands } : {}),
             })
             return
         }
         
-        // Al crear, agregar automáticamente el ID del usuario actual
         mutate({
             ...form,
-            duration_seconds: Number(form.duration_seconds),
-            total_commands: Number(form.total_commands),
-            blocked_commands: Number(form.blocked_commands),
             initiated_by_user_id: currentUser.id
         })
     }
