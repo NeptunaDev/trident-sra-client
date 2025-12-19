@@ -3,7 +3,7 @@ import { api } from "./axios";
 export interface Organization {
   id: string;
   name: string;
-  is_active: true;
+  is_active: boolean;
   plan: string;
   slug: string;
   max_users: number;

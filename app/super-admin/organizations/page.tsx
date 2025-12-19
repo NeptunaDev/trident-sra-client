@@ -26,7 +26,7 @@ export default function OrganizationsCrudPage() {
   const queryClient = useQueryClient();
   const { isLoading, setIsLoading } = useloadingStore();
 
-  const { data: organization } = useQuery({
+  const { data: organization } = useQuery<Organization[]>({
     queryKey: ["organizations"],
     queryFn: getOrganizations,
   });
@@ -108,10 +108,10 @@ export default function OrganizationsCrudPage() {
                   Max Connections
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Fecha de creación
+                  Date of creation
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Fecha de actualización
+                  Date of Update
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold w-[160px]">
                   Actions
