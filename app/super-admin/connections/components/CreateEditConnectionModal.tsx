@@ -28,6 +28,11 @@ const PROTOCOL_OPTIONS = [
   { label: "Telnet", value: "telnet" },
 ]
 
+const STATUS_OPTIONS = [
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+]
+
 const INITIAL_FORM: CreateConnection = {
   organization_id: "",
   create_by_user_id: "",
@@ -92,6 +97,7 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
         ...(form.username !== editingConnection.username ? { username: form.username } : {}),
         ...(form.organization_id !== editingConnection.organization_id ? { organization_id: form.organization_id } : {}),
         ...(form.description !== editingConnection.description ? { description: form.description } : {}),
+        ...(form.status !== editingConnection.status ? { status: form.status } : {}),
       })
       return
     }
@@ -213,6 +219,14 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
               items={organizations?.map((organization) => ({ label: organization.name, value: organization.id })) ?? []}
               onValueChange={(value) => setForm((prev) => ({ ...prev, organization_id: value }))}
               value={form.organization_id}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[#c0c5ce]">Status</Label>
+            <SelectSearch
+              items={STATUS_OPTIONS}
+              value={form.status}
+              onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
             />
           </div>
           <div className="space-y-2">

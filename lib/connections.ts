@@ -69,8 +69,15 @@ export const updateConnection = async (connection: UpdateConnection): Promise<Co
 export const deleteConnection = async (id: string): Promise<void> => {
   try {
     await api.delete(`/api/v1/connections/${id}`)
-    } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    throw error
+    // Se deben terminar las sesiones activas y se deben remover participantes asociados antes de eliminar
+    if (error.response?.status === 409) {
+      throw new Error(
+        error.response?.data?.detail || 
+        'Cannot delete connection: it has active sessions, participants or dependencies. Please remove them first.'
+      )
     }
+    throw error
+  }
 }

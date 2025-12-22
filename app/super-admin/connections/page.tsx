@@ -40,6 +40,11 @@ export default function ConnectionsCrudPage() {
       })
       setShowDeleteDialog(false)
       setDeletingConnection(null)
+    },
+    onError: (error: any) => {
+      const message = error.message || 'Failed to delete connection'
+      alert(message)
+      setShowDeleteDialog(false)
     }
   })
 
