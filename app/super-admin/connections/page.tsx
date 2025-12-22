@@ -172,7 +172,7 @@ export default function ConnectionsCrudPage() {
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         title="Confirm delete"
-        description={`¿Estás seguro de que deseas eliminar la conexión "${deletingConnection?.name}"? Esta acción no se puede deshacer.`}
+        description={`Are you sure you want to delete "${deletingConnection?.name}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         variant="destructive"

@@ -45,7 +45,7 @@ export default function CreateEditSessionModal({ isOpen, setIsOpen, editingSessi
   const [disabled, setDisabled] = useState(false)
   const [form, setForm] = useState<CreateSession>(INITIAL_FORM)
 
-  const { isLoading, setIsLoading } = useloadingStore()
+  const { setIsLoading } = useloadingStore()
   const queryClient = useQueryClient()
 
   const { data: currentUser } = useQuery({

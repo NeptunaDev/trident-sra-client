@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { createConnection, updateConnection, CreateConnection, Connection } from "@/lib/connections"
 import { Organization } from "@/lib/organization"
+import { getCurrentUser } from "@/lib/user"
 
 import { useloadingStore } from "@/store/loadingStore"
 
@@ -63,6 +64,10 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
       queryClient.invalidateQueries({
         queryKey: ["connections"]
       })
+    },
+    onError: (error: any) => {
+      console.error('Create error:', error)
+      alert(error.response?.data?.detail || error.message || 'Failed to create connection')
     }
   })
 
@@ -74,6 +79,10 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
       queryClient.invalidateQueries({
         queryKey: ["connections"]
       })
+    },
+    onError: (error: any) => {
+      console.error('Update error:', error)
+      alert(error.response?.data?.detail || error.message || 'Failed to update connection')
     }
   })
 
@@ -126,6 +135,10 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
   useEffect(() => {
     if (!isEditing) {
       setForm(INITIAL_FORM)
+      // fill create_by_user_id when creating new connection
+      getCurrentUser().then((user) => {
+        setForm((prev) => ({ ...prev, create_by_user_id: user.id }))
+      }).catch(console.error)
       return
     }
     setForm({
