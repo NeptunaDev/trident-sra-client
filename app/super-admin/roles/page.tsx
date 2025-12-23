@@ -172,7 +172,7 @@ export default function RolesCrudPage() {
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <div className="flex items-center justify-center gap-2">
+                      <div className="flex gap-2">
                         <div
                           className="w-4 h-4 rounded-full border border-[rgba(91,194,231,0.3)]"
                           style={{ backgroundColor: it.color }}
