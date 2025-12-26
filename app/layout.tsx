@@ -2,8 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
-import { Providers } from "./providers"
-import Loading from "@/components/loading"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,12 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen">
-        <Providers>
-          <Loading />
-          {children}
-        </Providers>
-      </body>
+      <body className="min-h-screen">{children}</body>
     </html>
   )
 }

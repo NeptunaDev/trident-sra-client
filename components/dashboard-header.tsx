@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Plus, Bell, User as UserIcon, LogOut, Settings } from "lucide-react"
+import { Search, Plus, Bell, User, LogOut, Settings } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import {
@@ -16,28 +16,29 @@ import {
 import { Avatar, AvatarFallback } from "./ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 import { LanguageSwitcher } from "./language-switcher"
+import { getCurrentUser, logout } from "@/lib/auth"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
-import { useQuery } from "@tanstack/react-query"
-import { getCurrentUser } from "@/lib/user"
-import { useAuthStore } from "@/store/authStore"
 
 export function DashboardHeader() {
   const router = useRouter()
   const [showNewConnection, setShowNewConnection] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [lang, setLang] = useState<Language>("en")
-  const logout = useAuthStore((state) => state.logout)
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
 
-  // TODO: Usar is loading
-  const { data: currentUser } = useQuery({
-    queryKey: ["currentUser"],
-    queryFn: getCurrentUser
-  })
+  useEffect(() => {
+    setLang(getLanguage())
+    const currentUser = getCurrentUser()
+    if (currentUser) {
+      setUser({ name: currentUser.name, email: currentUser.email })
+    }
+  }, [])
 
   const t = translations[lang]
 
   const handleLogout = () => {
     logout()
+    router.push("/login")
   }
 
   const handleProfileClick = () => {
@@ -122,7 +123,7 @@ export function DashboardHeader() {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
                 <AvatarFallback className="bg-[#5bc2e7] text-[#11111f]">
-                  {currentUser?.name?.[0]?.toUpperCase() || "U"}
+                  {user?.name?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -130,13 +131,13 @@ export function DashboardHeader() {
           <DropdownMenuContent align="end" className="w-56 bg-[#2a2a3e] border-[#5bc2e7]">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <span className="font-semibold text-white">{currentUser?.name || "User"}</span>
-                <span className="text-xs text-[#c0c5ce]">{currentUser?.email || "user@example.com"}</span>
+                <span className="font-semibold text-white">{user?.name || "User"}</span>
+                <span className="text-xs text-[#c0c5ce]">{user?.email || "user@example.com"}</span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-[rgba(91,194,231,0.2)]" />
             <DropdownMenuItem onClick={handleProfileClick} className="hover:bg-[#5bc2e7] hover:text-[#11111f] text-white focus:bg-[#5bc2e7] focus:text-[#11111f] data-[highlighted]:bg-[#5bc2e7] data-[highlighted]:text-[#11111f]">
-              <UserIcon className="w-4 h-4 mr-2" />
+              <User className="w-4 h-4 mr-2" />
               {lang === "en" ? "Profile" : "Perfil"}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleSettingsClick} className="hover:bg-[#5bc2e7] hover:text-[#11111f] text-white focus:bg-[#5bc2e7] focus:text-[#11111f] data-[highlighted]:bg-[#5bc2e7] data-[highlighted]:text-[#11111f]">
