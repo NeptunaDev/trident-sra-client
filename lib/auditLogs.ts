@@ -6,7 +6,7 @@ export interface AuditLogs {
   action: string;
   description: string;
   status: string;
-  details: {};
+  details: Record<string, any> | null;
   user_id: string;
   organization_id: string;
   timestamp: string;
@@ -18,7 +18,7 @@ export interface CreateAuditLogs {
   action: string;
   description: string;
   status: string;
-  details: {};
+  details: Record<string, any> | null;
   organization_id: string;
   user_id: string;
 }
@@ -29,22 +29,22 @@ export interface UpdateAuditLogs extends Partial<CreateAuditLogs> {
 
 export const getAuditLogs = async (): Promise<AuditLogs[]> => {
   try {
-    const response = await api.get<AuditLogs[]>("/api/v1/audit-logs");
+    const response = await api.get<AuditLogs[]>("/api/v1/audit-logs/");
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error("Error al obtener los logs de auditoría:", error);
     throw error;
   }
 };
 
 export const createAuditLogs = async (
-  auditLogs: CreateAuditLogs
+  data: CreateAuditLogs
 ): Promise<AuditLogs> => {
   try {
-    const response = await api.post<AuditLogs>("/api/v1/audit-logs", auditLogs);
+    const response = await api.post<AuditLogs>("/api/v1/audit-logs/", data);
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error("Error al crear el log:", error);
     throw error;
   }
 };

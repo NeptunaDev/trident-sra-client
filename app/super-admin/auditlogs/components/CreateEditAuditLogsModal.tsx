@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import {
   CreateAuditLogs,
   createAuditLogs,
@@ -36,8 +35,8 @@ type FormData = {
   action: string;
   description: string;
   status: string;
-  organization_id: string;
   user_id: string;
+  organization_id: string;
 };
 
 const INITIAL_FORM: FormData = {
@@ -45,8 +44,8 @@ const INITIAL_FORM: FormData = {
   action: "",
   description: "",
   status: "",
-  organization_id: "",
   user_id: "",
+  organization_id: "",
 };
 
 export default function CreateEditAuditLogsModal({
@@ -57,11 +56,8 @@ export default function CreateEditAuditLogsModal({
   const isEditing = !!editingAuditLog;
   const [disabled, setDisabled] = useState(false);
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
-
   const { isLoading, setIsLoading } = useloadingStore();
   const queryClient = useQueryClient();
-
-  // Obtener usuarios y organizaciones
   const { data: users } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: getUser,
@@ -80,26 +76,6 @@ export default function CreateEditAuditLogsModal({
       queryClient.invalidateQueries({
         queryKey: ["audit-logs"],
       });
-    },
-    onError: (error: any) => {
-      console.error("Error creating audit log:", error);
-      console.error("Error response:", error.response);
-      console.error("Error response data:", error.response?.data);
-      console.error("Error response status:", error.response?.status);
-
-      // Mostrar errores de validación del backend
-      if (error.response?.status === 422 && error.response?.data?.detail) {
-        const validationErrors = error.response.data.detail;
-        console.error("Validation errors:", validationErrors);
-        // Aquí podrías mostrar estos errores al usuario con un toast o alert
-        validationErrors.forEach((err: any) => {
-          console.error(
-            `Field: ${err.loc?.join(".")}, Message: ${err.msg}, Type: ${
-              err.type
-            }`
-          );
-        });
-      }
     },
   });
 
@@ -155,10 +131,8 @@ export default function CreateEditAuditLogsModal({
     mutate(createData);
   };
 
-  // Management the state the disabled
   useEffect(() => {
     if (isEditing) {
-      // In edit mode, allow saving if at least one field has changed
       const hasChanges =
         form.event_type !== editingAuditLog?.event_type ||
         form.action !== editingAuditLog?.action ||

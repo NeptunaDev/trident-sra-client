@@ -11,6 +11,7 @@ import {
   SessionParticipantRole,
 } from "@/lib/sessionParticipants";
 import { getUser, User } from "@/lib/user";
+import { getSessions, Session } from "@/lib/session";
 import { useloadingStore } from "@/store/loadingStore";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,11 +69,33 @@ export default function CreateEditSessionParticipantsModal({
   const { isLoading, setIsLoading } = useloadingStore();
   const queryClient = useQueryClient();
 
-  // Obtener usuarios
+  // Obtener usuarios y sesiones
   const { data: users } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: getUser,
   });
+
+  const { data: sessions, error: sessionsError } = useQuery<Session[]>({
+    queryKey: ["sessions"],
+    queryFn: getSessions,
+  });
+
+  useEffect(() => {
+    if (sessions) {
+      console.log("Sessions loaded:", sessions);
+      console.log("Sessions count:", sessions.length);
+    }
+    if (sessionsError) {
+      console.error("Sessions error:", sessionsError);
+      if ((sessionsError as any).response) {
+        console.error("Error response:", (sessionsError as any).response);
+        console.error(
+          "Error response data:",
+          (sessionsError as any).response?.data
+        );
+      }
+    }
+  }, [sessions, sessionsError]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createSessionParticipant,
@@ -124,17 +147,20 @@ export default function CreateEditSessionParticipantsModal({
           console.error("Validation errors:", validationErrors);
           if (Array.isArray(validationErrors)) {
             validationErrors.forEach((err: any) => {
+              const fieldPath = err.loc?.join(".") || "unknown";
               console.error(
-                `Field: ${err.loc?.join(".")}, Message: ${err.msg}, Type: ${
-                  err.type
-                }`
+                `❌ Field: ${fieldPath}, Message: ${err.msg}, Type: ${err.type}`
               );
+              // Mostrar el valor que causó el error si está disponible
+              if (err.ctx) {
+                console.error(`   Context:`, err.ctx);
+              }
             });
           }
         } else {
           console.error(
             "422 error but no error details. Full response data:",
-            errorData
+            JSON.stringify(errorData, null, 2)
           );
         }
       }
@@ -189,19 +215,30 @@ export default function CreateEditSessionParticipantsModal({
       return;
     }
 
+    if (!form.session_id.trim() || !form.user_id.trim()) {
+      console.error("Missing required fields: session_id or user_id");
+      return;
+    }
+
+    let joinAtDate: string | null = null;
+    if (form.join_at && form.join_at.trim() !== "") {
+      try {
+        const dateObj = new Date(form.join_at);
+        if (!isNaN(dateObj.getTime())) {
+          joinAtDate = dateObj.toISOString();
+        }
+      } catch (error) {
+        console.error("Error parsing date:", error);
+      }
+    }
+
     const createData: CreateSessionParticipant = {
       role: form.role,
       can_write: form.can_write,
       session_id: form.session_id.trim(),
       user_id: form.user_id.trim(),
-      join_at: form.join_at || new Date().toISOString(),
+      join_at: joinAtDate,
     };
-
-    // Validar que todos los campos requeridos estén presentes
-    if (!createData.session_id || !createData.user_id || !createData.join_at) {
-      console.error("Missing required fields:", createData);
-      return;
-    }
 
     console.log(
       "Creating session participant with data:",
@@ -213,11 +250,11 @@ export default function CreateEditSessionParticipantsModal({
       session_id: typeof createData.session_id,
       user_id: typeof createData.user_id,
       join_at: typeof createData.join_at,
+      join_at_value: createData.join_at,
     });
     mutate(createData);
   };
 
-  // Management the state the disabled
   useEffect(() => {
     if (isEditing) {
       const hasChanges =
@@ -234,12 +271,10 @@ export default function CreateEditSessionParticipantsModal({
     }
   }, [form, isEditing, editingSessionParticipant]);
 
-  // Management the state the loading
   useEffect(() => {
     setIsLoading(isPending || isUpdatePending);
   }, [isPending, isUpdatePending, setIsLoading]);
 
-  // Reset form when modal opens/closes or editing changes
   useEffect(() => {
     if (!isOpen) {
       setForm(INITIAL_FORM);
@@ -276,14 +311,31 @@ export default function CreateEditSessionParticipantsModal({
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-[#c0c5ce]">Session ID</Label>
-            <Input
-              name="session_id"
-              value={form.session_id}
-              onChange={handleChange}
-              placeholder="session-id-here"
-              className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
-            />
+            <Label className="text-[#c0c5ce]">Session</Label>
+            {sessionsError ? (
+              <div className="text-sm text-red-400">
+                Error loading sessions. Check console for details.
+              </div>
+            ) : sessions && sessions.length === 0 ? (
+              <div className="text-sm text-yellow-400">
+                No sessions available. Make sure sessions exist in the system.
+              </div>
+            ) : (
+              <SelectSearch
+                items={
+                  sessions?.map((session) => ({
+                    label: `${session.public_session_id || session.id} (${
+                      session.status
+                    })`,
+                    value: session.id,
+                  })) ?? []
+                }
+                onValueChange={(value) =>
+                  setForm((prev) => ({ ...prev, session_id: value }))
+                }
+                value={form.session_id}
+              />
+            )}
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">User</Label>

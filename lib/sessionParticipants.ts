@@ -13,11 +13,11 @@ export interface SessionParticipant {
 }
 
 export interface CreateSessionParticipant {
-  session_id: string;
-  user_id: string;
   role: SessionParticipantRole;
   can_write: boolean;
-  join_at: string;
+  session_id: string;
+  user_id: string;
+  join_at: string | null;
 }
 
 export interface UpdateSessionParticipant {
@@ -33,7 +33,7 @@ export const getSessionParticipants = async (): Promise<
 > => {
   try {
     const response = await api.get<SessionParticipant[]>(
-      "/api/v1/sessions-participant"
+      "/api/v1/sessions-participant/"
     );
     return response.data;
   } catch (error) {
@@ -47,7 +47,7 @@ export const createSessionParticipant = async (
 ): Promise<SessionParticipant> => {
   try {
     const response = await api.post<SessionParticipant>(
-      "/api/v1/sessions-participant",
+      "/api/v1/sessions-participant/",
       sessionParticipant
     );
     return response.data;

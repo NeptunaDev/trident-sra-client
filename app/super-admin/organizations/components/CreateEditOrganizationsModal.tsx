@@ -8,9 +8,7 @@ import {
   Organization,
   updateOrganization,
 } from "@/lib/organization";
-
 import { useloadingStore } from "@/store/loadingStore";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -55,10 +53,8 @@ export default function CreateEditOrganizationsModal({
   const isEditng = !!editingOrganizations;
   const [disabled, setDisabled] = useState(false);
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
-
   const { isLoading, setIsLoading } = useloadingStore();
   const queryClient = useQueryClient();
-
   const { mutate, isPending } = useMutation({
     mutationFn: CreateOrganization,
     onSuccess: () => {
