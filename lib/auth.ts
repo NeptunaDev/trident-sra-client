@@ -1,32 +1,41 @@
-import { api } from './axios'
-import { useAuthStore } from '@/store/authStore'
-
-export interface Login {
+export interface User {
+  id: string
   email: string
-  password: string
+  name: string
+  role: "admin" | "user" | "viewer"
+  avatar?: string
 }
 
-export interface TokenPayload {
-  role_name: string
-}
-
-export interface LoginResponse {
-  access_token: string
-  refresh_token: string
-  token_type: string
-}
-
-export const getAccessToken = (): string | null => {
-  if (typeof window === "undefined") return null
-  return useAuthStore.getState().accessToken
-}
-
-export const login = async (loginData: Login): Promise<LoginResponse> => {
-  try {
-    const response = await api.post<LoginResponse>('/api/v1/auth/login', loginData)
-    return response.data
-  } catch (error) {
-    console.error(error)
-    throw error
+export function login(email: string, password: string): User | null {
+  // Accept any email/password for demo purposes
+  if (email && password) {
+    const user: User = {
+      id: "1",
+      email,
+      name: email.split("@")[0],
+      role: "admin",
+    }
+    localStorage.setItem("trident_user", JSON.stringify(user))
+    return user
   }
+  return null
+}
+
+export function logout(): void {
+  localStorage.removeItem("trident_user")
+}
+
+export function getCurrentUser(): User | null {
+  if (typeof window === "undefined") return null
+  const userStr = localStorage.getItem("trident_user")
+  if (!userStr) return null
+  try {
+    return JSON.parse(userStr)
+  } catch {
+    return null
+  }
+}
+
+export function isAuthenticated(): boolean {
+  return getCurrentUser() !== null
 }

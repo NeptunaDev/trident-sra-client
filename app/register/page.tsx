@@ -13,7 +13,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
 import { Check } from "lucide-react"
 import Link from "next/link"
-import { RouteGuard } from "@/components/route-guard"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -29,8 +28,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <RouteGuard requireGuest>
-      <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
       <WaveBackground />
 
       <div className="w-full max-w-2xl relative z-10">
@@ -223,7 +221,6 @@ export default function RegisterPage() {
           </form>
         </div>
       </div>
-      </div>
-    </RouteGuard>
+    </div>
   )
 }
