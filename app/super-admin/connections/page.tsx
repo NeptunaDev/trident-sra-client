@@ -1,65 +1,74 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useMutation,useQuery, useQueryClient } from "@tanstack/react-query"
-import {  Pencil, Plus, Trash2 } from "lucide-react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 
-import { getConnections } from "@/lib/connections"
-import { getSession, deleteSession, Session } from "@/lib/session"
+import { getOrganizations } from "@/lib/organization"
 import { formatDate } from "@/lib/utils"
+import { deleteConnection, getConnections, Connection } from "@/lib/connections"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { AlertDialog } from "@/components/ui/alert-dialog"
-import CreateEditSessionModal from "./components/CreateEditModal"
+import CreateEditConnectionModal from "./components/CreateEditConnectionModal"
 import { useloadingStore } from "@/store/loadingStore"
 
-export default function SessionsCrudPage() {
+export default function ConnectionsCrudPage() {
   const [isOpen, setIsOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [editingSession, setEditingSession] = useState<Session | null>(null)
-  const [deletingSession, setDeletingSession] = useState<Session | null>(null)
+  const [editingConnection, setEditingConnection] = useState<Connection | null>(null)
+  const [deletingConnection, setDeletingConnection] = useState<Connection | null>(null)
   const queryClient = useQueryClient()
   const { isLoading, setIsLoading } = useloadingStore()
 
-  const { data: sessions } = useQuery({
-    queryKey: ["sessions"],
-    queryFn: getSession
-  })  
-
-  const {data: connections } = useQuery({
+  const { data: connections } = useQuery({
     queryKey: ["connections"],
     queryFn: getConnections
-  }) 
+  })
+
+  const { data: organizations } = useQuery({
+    queryKey: ["organizations"],
+    queryFn: getOrganizations
+  })
+
   const { mutate, isPending } = useMutation({
-    mutationFn: deleteSession,
+    mutationFn: deleteConnection,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["sessions"]
+        queryKey: ["connections"]
       })
       setShowDeleteDialog(false)
-      setDeletingSession(null)
+      setDeletingConnection(null)
+    },
+    onError: (error: any) => {
+      const message = error.message || 'Failed to delete connection'
+      alert(message)
+      setShowDeleteDialog(false)
     }
   })
 
   const handleOpenDialog = () => {
-    setEditingSession(null)
+    setEditingConnection(null)
     setIsOpen(true)
   }
+
   const confirmDelete = () => {
-    mutate(deletingSession?.id ?? "")
+    mutate(deletingConnection?.id ?? "")
   }
-  const handleEdit = (it: Session) => {
-    setEditingSession(it)
+
+  const handleEdit = (it: Connection) => {
+    setEditingConnection(it)
     setIsOpen(true)
   }
-  const handleDelete = (it: Session) => {
-    setDeletingSession(it)
+  
+  const handleDelete = (it: Connection) => {
+    setDeletingConnection(it)
     setShowDeleteDialog(true)
   }
 
   useEffect(() => {
-    if(isPending !== isLoading) {
+    if (isPending !== isLoading) {
       setIsLoading(isPending)
     }
   }, [isPending, isLoading, setIsLoading])
@@ -68,8 +77,8 @@ export default function SessionsCrudPage() {
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Sessions</h1>
-          <p className="text-sm text-[#c0c5ce]">Create, update and delete sessions.</p>
+          <h1 className="text-2xl font-semibold text-white">Connections</h1>
+          <p className="text-sm text-[#c0c5ce]">Create, update and delete connections.</p>
         </div>
         <Button
           onClick={handleOpenDialog}
@@ -86,48 +95,42 @@ export default function SessionsCrudPage() {
             <thead className="bg-[#0f0f1c] border-b border-[rgba(91,194,231,0.2)]">
               <tr className="text-left">
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">ID</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Public Session ID</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Connection</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Name</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Type</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Hostname</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Port</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Username</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Organization</th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Status</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Recording</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Duration</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Total Commands</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Blocked Commands</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Started</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Created</th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold w-[160px]">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {sessions?.length === 0 ? (
+              {connections?.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="py-10 px-4 text-center text-[#6b7280]">
                     No results.
                   </td>
                 </tr>
               ) : (
-                sessions?.map((it) => (
+                connections?.map((it) => (
                   <tr key={it.id} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
                     <td className="py-3 px-4 text-white font-medium">{it.id.split("-")[0]}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.public_session_id}</td>
+                    <td className="py-3 px-4 text-white font-medium">{it.name}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {connections?.find((conn) => conn.id === it.connection_id)?.name || "-"}
+                      <span className="uppercase">{it.protocol}</span>
+                    </td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it.hostname}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it.port}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it.username}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      {organizations?.find((org) => org.id === it.organization_id)?.name || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
                       <span className="capitalize">{it.status}</span>
                     </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.recording_enabled ? "Yes" : "No"}
-                    </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.duration_seconds !== null && it.duration_seconds !== undefined ? `${it.duration_seconds}s` : "0s"}
-                    </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.total_commands ?? 0}
-                    </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.blocked_commands ?? 0}
-                    </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.started_at)}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.created_at)}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Button
@@ -158,17 +161,18 @@ export default function SessionsCrudPage() {
         </div>
       </Card>
 
-      <CreateEditSessionModal
+      <CreateEditConnectionModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        editingSession={editingSession}
+        organizations={organizations ?? []}
+        editingConnection={editingConnection}
       />
 
       <AlertDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         title="Confirm delete"
-        description={`¿Estás seguro de que deseas eliminar la sesión "${deletingSession?.public_session_id}"? Esta acción no se puede deshacer.`}
+        description={`Are you sure you want to delete "${deletingConnection?.name}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         variant="destructive"

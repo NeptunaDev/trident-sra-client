@@ -15,6 +15,7 @@ import {
   PlayCircle,
   Video,
   TerminalSquare,
+  Network,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ const navItems: NavItem[] = [
     href: "/super-admin/organizations",
     icon: Building2,
   },
+  { title: "Connections", href: "/super-admin/connections", icon: Network },
   { title: "Audit Logs", href: "/super-admin/auditlogs", icon: ScrollText },
   { title: "Policies", href: "/super-admin/policies", icon: FileKey2 },
   { title: "Participants", href: "/super-admin/participants", icon: UserRound },
