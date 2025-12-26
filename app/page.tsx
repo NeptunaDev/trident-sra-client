@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { Shield, Terminal, Users, Eye, ArrowRight, Check } from "lucide-react"
 import Link from "next/link"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
+import { RouteGuard } from "@/components/route-guard"
 
 export default function LandingPage() {
   const [lang, setLang] = useState<Language>("en")
@@ -59,7 +60,8 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative">
+    <RouteGuard requireGuest>
+      <div className="min-h-screen bg-[#0a0a0f] relative">
       <WaveBackground />
 
       {/* Header */}
@@ -165,6 +167,7 @@ export default function LandingPage() {
           <p>© 2025 TRIDENT by NEPTUNA. {lang === "en" ? "All rights reserved." : "Todos los derechos reservados."}</p>
         </div>
       </footer>
-    </div>
+      </div>
+    </RouteGuard>
   )
 }

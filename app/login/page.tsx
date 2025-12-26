@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { WaveBackground } from "@/components/wave-background"
 import { TridentLogo } from "@/components/trident-logo"
 import { LanguageSwitcher } from "@/components/language-switcher"
@@ -13,46 +12,77 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Circle } from "lucide-react"
 import Link from "next/link"
-import { login } from "@/lib/auth"
+import { Login, login, LoginResponse, TokenPayload } from "@/lib/auth"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
+import { useMutation } from "@tanstack/react-query"
+import { jwtDecode } from "jwt-decode"
+import { useloadingStore } from "@/store/loadingStore"
+import { useAuthStore } from "@/store/authStore"
+import { RouteGuard } from "@/components/route-guard"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
   const [lang, setLang] = useState<Language>("en")
+  const t = translations[lang]
+  const { isLoading, setIsLoading } = useloadingStore()
+  const setSession = useAuthStore((s) => s.setSession)
+  const [form, setForm] = useState<Login>({
+    email: "",
+    password: "",
+  })
+
+  const { mutate, isPending } = useMutation<LoginResponse, Error, Login>({
+    mutationFn: login,
+    onSuccess: (data: LoginResponse) => {
+      const { access_token, refresh_token } = data
+      const accessTokenDecode = jwtDecode<TokenPayload>(access_token)
+      const roleName = accessTokenDecode.role_name
+      
+      setSession({
+        roleName,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        user: { email: form.email },
+      })
+    },
+    onError: (error: Error) => {
+      console.error("Login error:", error)
+    },
+  })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    mutate(form)
+  }
 
   useEffect(() => {
     setLang(getLanguage())
   }, [])
 
-  const t = translations[lang]
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-
-    const user = login(email, password)
-    if (user) {
-      router.push("/dashboard")
-    } else {
-      setError(lang === "en" ? "Invalid credentials" : "Credenciales inválidas")
+  useEffect(() => {
+    if (isPending !== isLoading) {
+      setIsLoading(isPending)
     }
-  }
+  }, [isPending])
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
+    <RouteGuard requireGuest>
+      <div className="min-h-screen bg-[#0a0a0f] relative flex items-center justify-center p-4">
       <WaveBackground />
 
-      {/* Language Switcher - Top Right */}
       <div className="absolute top-4 right-4 z-20">
         <LanguageSwitcher />
       </div>
 
       <div className="w-full max-w-md relative z-10">
         <div className="glass rounded-lg p-8 shadow-2xl">
-          {/* Logo and Tagline */}
           <div className="flex flex-col items-center mb-8">
             <TridentLogo className="mb-4" />
             <p className="text-sm text-[#c0c5ce] text-center">
@@ -60,16 +90,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Error Message */}
-            {error && (
-              <div className="p-3 rounded-lg bg-[#ff6b6b]/10 border border-[#ff6b6b] text-[#ff6b6b] text-sm">
-                {error}
-              </div>
-            )}
-
-            {/* Email Input */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-white">
                 {t.email}
@@ -77,15 +98,15 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                name="email"
                 placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={form.email}
+                onChange={handleChange}
                 className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] font-mono text-white"
                 required
               />
             </div>
 
-            {/* Password Input */}
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium text-white">
                 {t.password}
@@ -93,15 +114,15 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                name="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={form.password}
+                onChange={handleChange}
                 className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                 required
               />
             </div>
 
-            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Checkbox id="remember" />
@@ -114,7 +135,6 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            {/* Sign In Button */}
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold"
@@ -122,7 +142,6 @@ export default function LoginPage() {
               {t.sign_in}
             </Button>
 
-            {/* Sign Up Link */}
             <p className="text-center text-sm text-[#c0c5ce]">
               {t.no_account}{" "}
               <Link href="/register" className="text-[#5bc2e7] hover:underline font-medium">
@@ -131,7 +150,6 @@ export default function LoginPage() {
             </p>
           </form>
 
-          {/* Status Indicator */}
           <div className="mt-8 pt-6 border-t border-[rgba(91,194,231,0.2)]">
             <div className="flex items-center justify-center gap-2 text-xs text-[#c0c5ce]">
               <Circle className="w-2 h-2 fill-[#00ff88] text-[#00ff88]" />
@@ -141,5 +159,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </RouteGuard>
   )
 }
