@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Shield, Users, KeyRound, Building2, ScrollText, FileKey2, UserRound, PlayCircle, Video, TerminalSquare } from "lucide-react"
+import { Shield, Users, KeyRound, Building2, ScrollText, FileKey2, UserRound, PlayCircle, Video, TerminalSquare, Network } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { TridentLogo } from "@/components/trident-logo"
@@ -19,6 +19,7 @@ const navItems: NavItem[] = [
   { title: "Users", href: "/super-admin/users", icon: Users },
   { title: "Roles", href: "/super-admin/roles", icon: KeyRound },
   { title: "Organizations", href: "/super-admin/organizations", icon: Building2 },
+  { title: "Connections", href: "/super-admin/connections", icon: Network },
   { title: "Audit Logs", href: "/super-admin/auditlogs", icon: ScrollText },
   { title: "Policies", href: "/super-admin/policies", icon: FileKey2 },
   { title: "Participants", href: "/super-admin/participants", icon: UserRound },
