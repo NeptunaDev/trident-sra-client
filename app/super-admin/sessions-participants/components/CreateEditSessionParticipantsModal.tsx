@@ -11,7 +11,7 @@ import {
   SessionParticipantRole,
 } from "@/lib/sessionParticipants";
 import { getUser, User } from "@/lib/user";
-import { getSessions, Session } from "@/lib/session";
+import { getSession, Session } from "@/lib/session";
 import { useloadingStore } from "@/store/loadingStore";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,7 +77,7 @@ export default function CreateEditSessionParticipantsModal({
 
   const { data: sessions, error: sessionsError } = useQuery<Session[]>({
     queryKey: ["sessions"],
-    queryFn: getSessions,
+    queryFn: getSession,
   });
 
   useEffect(() => {
