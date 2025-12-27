@@ -1,0 +1,59 @@
+# Cursor Rules para Trident SRA Client
+
+## Stack Tecnológico
+
+- Next.js 15 con App Router
+- React 19
+- TypeScript (strict mode)
+- TanStack Query (React Query) v5
+- Tailwind CSS
+- Zustand para estado global
+- Axios para peticiones HTTP
+
+## Convenciones de Código
+
+### TypeScript
+
+- Siempre usar tipos explícitos en `useQuery` y `useMutation`
+- Ejemplo: `useQuery<User[]>({ queryKey: ["users"], queryFn: getUser })`
+- Usar interfaces para props de componentes
+- Exportar tipos e interfaces desde archivos `lib/`
+
+### React Query
+
+- Siempre especificar el tipo genérico en `useQuery<T>` y `useMutation<T>`
+- Usar `queryKey` en formato array: `["resource"]` o `["resource", id]`
+- Las funciones `queryFn` deben retornar `Promise<T>`
+
+### Imports
+
+- Usar alias `@/` para imports absolutos
+- Agrupar imports: React, librerías externas, componentes locales, utils
+
+### Componentes
+
+- Componentes funcionales con TypeScript
+- "use client" para componentes interactivos
+- Props tipadas con interfaces
+
+## Estructura del Proyecto
+
+- `app/` - Rutas de Next.js App Router
+- `components/` - Componentes reutilizables
+- `lib/` - Utilidades y funciones helper
+- `store/` - Estado global con Zustand
+- `hooks/` - Custom hooks
+
+## Patrones Comunes
+
+### CRUD Pages
+
+- Usar `useQuery` con tipo genérico para obtener datos
+- Usar `useMutation` para crear/actualizar/eliminar
+- Manejar estados de loading con `isPending` o `isLoading`
+- Invalidar queries después de mutaciones exitosas
+
+### Tipos
+
+- Interfaces en archivos `lib/` correspondientes (ej: `lib/user.ts` exporta `User`)
+- Usar tipos explícitos en hooks de React Query para mejor autocompletado

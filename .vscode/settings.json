@@ -1,0 +1,15 @@
+{
+  "cursor.cpp.disabledLanguages": [],
+  "cursor.general.enableAutoComplete": true,
+  "cursor.chat.enableCodeActions": true,
+  "typescript.tsserver.log": "off",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggest.showStatusBar": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    "strings": "on"
+  }
+}
