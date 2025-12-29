@@ -8,7 +8,7 @@ import {
   UpdateAuditLogs,
   AuditLogs,
 } from "@/lib/auditLogs";
-import { getUser, User } from "@/lib/user";
+import { getUser, User } from "@/lib/user/user";
 import { getOrganizations, Organization } from "@/lib/organization";
 import { useloadingStore } from "@/store/loadingStore";
 import { Button } from "@/components/ui/button";

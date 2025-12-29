@@ -7,7 +7,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { getRoles, Role } from "@/lib/role";
 import { getOrganizations, Organization } from "@/lib/organization";
 import { formatDate } from "@/lib/utils";
-import { deleteUser, getUser, User } from "@/lib/user";
+import { deleteUser, getUser, User } from "@/lib/user/user";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

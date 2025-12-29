@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { createSessionRecording, updateSessionRecording, CreateSessionRecording, SessionRecording } from "@/lib/session_recording"
 import { getSession } from "@/lib/session"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 
 import { useloadingStore } from "@/store/loadingStore"
 

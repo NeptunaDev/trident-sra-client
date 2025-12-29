@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Bell, Search, User as UserIcon } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"

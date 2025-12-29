@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { createConnection, updateConnection, CreateConnection, Connection } from "@/lib/connections"
 import { Organization } from "@/lib/organization"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 
 import { useloadingStore } from "@/store/loadingStore"
 

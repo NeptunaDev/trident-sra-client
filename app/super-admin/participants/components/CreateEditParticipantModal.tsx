@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { CreateParticipant, updateParticipant, createParticipant, Participant } from "@/lib/participant"
 import { getSession } from "@/lib/session"
-import { getUser } from "@/lib/user"
+import { getUser } from "@/lib/user/user"
 
 import { useloadingStore } from "@/store/loadingStore"
 

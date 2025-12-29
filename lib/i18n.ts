@@ -84,6 +84,20 @@ export const translations = {
     total: "Total",
     connected: "Connected",
     disconnected: "Disconnected",
+
+    // Validation messages
+    validation_name_required: "Name is required",
+    validation_name_min: "Name must be at least 3 characters",
+    validation_name_max: "Name must be less than 100 characters",
+    validation_email_required: "Email is required",
+    validation_email_invalid: "Invalid email format",
+    validation_password_required: "Password is required",
+    validation_password_min: "Password must be at least 8 characters",
+    validation_password_uppercase: "Password must contain at least one uppercase letter",
+    validation_password_lowercase: "Password must contain at least one lowercase letter",
+    validation_password_number: "Password must contain at least one number",
+    validation_role_required: "Role is required",
+    validation_organization_required: "Organization is required",
   },
   es: {
     // Navigation
@@ -168,6 +182,20 @@ export const translations = {
     total: "Total",
     connected: "Conectado",
     disconnected: "Desconectado",
+
+    // Validation messages
+    validation_name_required: "El nombre es requerido",
+    validation_name_min: "El nombre debe tener al menos 3 caracteres",
+    validation_name_max: "El nombre debe tener menos de 100 caracteres",
+    validation_email_required: "El correo es requerido",
+    validation_email_invalid: "Formato de correo inválido",
+    validation_password_required: "La contraseña es requerida",
+    validation_password_min: "La contraseña debe tener al menos 8 caracteres",
+    validation_password_uppercase: "La contraseña debe contener al menos una letra mayúscula",
+    validation_password_lowercase: "La contraseña debe contener al menos una letra minúscula",
+    validation_password_number: "La contraseña debe contener al menos un número",
+    validation_role_required: "El rol es requerido",
+    validation_organization_required: "La organización es requerida",
   },
 }
 
