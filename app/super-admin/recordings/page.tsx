@@ -108,7 +108,7 @@ export default function RecordingsCrudPage() {
                                         <td className="py-3 px-4 text-[#c0c5ce]">{it.session_id.split("-")[0]}</td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">{it.file_name}</td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {(it.file_size_bytes / (1024 * 1024)).toFixed(2)}
+                                            {(Number(it.file_size_bytes) / (1024 * 1024)).toFixed(4)}
                                         </td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
                                             {it.duration_seconds}

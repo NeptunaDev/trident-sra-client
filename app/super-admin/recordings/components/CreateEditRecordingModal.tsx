@@ -101,8 +101,8 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
                 ...(form.session_id !== editingRecording.session_id ? { session_id: form.session_id } : {}),
                 ...(form.file_url !== editingRecording.file_url ? { file_url: form.file_url } : {}),
                 ...(form.file_name !== editingRecording.file_name ? { file_name: form.file_name } : {}),
-                ...(form.file_size_bytes !== editingRecording.file_size_bytes ? { file_size_bytes: form.file_size_bytes } : {}),
-                ...(form.duration_seconds !== editingRecording.duration_seconds ? { duration_seconds: form.duration_seconds } : {}),
+                ...(Number(form.file_size_bytes) !== Number(editingRecording.file_size_bytes) ? { file_size_bytes: Number(form.file_size_bytes) } : {}),
+                ...(Number(form.duration_seconds) !== Number(editingRecording.duration_seconds) ? { duration_seconds: Number(form.duration_seconds) } : {}),
                 ...(form.status !== editingRecording.status ? { status: form.status } : {}),
             })
             return
@@ -134,8 +134,8 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
             session_id: editingRecording!.session_id,
             file_url: editingRecording!.file_url,
             file_name: editingRecording!.file_name,
-            file_size_bytes: editingRecording!.file_size_bytes,
-            duration_seconds: editingRecording!.duration_seconds,
+            file_size_bytes: Number(editingRecording!.file_size_bytes) ,
+            duration_seconds: Number(editingRecording!.duration_seconds),
             status: editingRecording!.status,
         })
     }, [editingRecording, isEditing])
@@ -176,16 +176,18 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-[#c0c5ce]">File Size (bytes)</Label>
+                        <Label className="text-[#c0c5ce]">File Size (MB)</Label>
                         <Input
-                            name="file_size_bytes"
+                            name="file_size_mb"
                             type="text"
-                            value={form.file_size_bytes.toString()}
+                            value={(form.file_size_bytes / (1024 * 1024)).toFixed(4)}
                             onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, '')
-                                setForm((prev) => ({ ...prev, file_size_bytes: value ? parseInt(value) : 0 }))
+                                const value = e.target.value.replace(/[^0-9.]/g, '')
+                                const mb = parseFloat(value) || 0
+                                const bytes = Math.round(mb * 1024 * 1024)
+                                setForm((prev) => ({ ...prev, file_size_bytes: bytes }))
                             }}
-                            placeholder="1024000"
+                            placeholder="5.50"
                             className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                         />
                     </div>
