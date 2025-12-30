@@ -9,7 +9,10 @@ import {
   AuditLogs,
 } from "@/lib/auditLogs";
 import { getUser, User } from "@/lib/user/user";
-import { getOrganizations, Organization } from "@/lib/organization";
+import {
+  getOrganizations,
+  Organization,
+} from "@/lib/organization/organization";
 import { useloadingStore } from "@/store/loadingStore";
 import { Button } from "@/components/ui/button";
 import {

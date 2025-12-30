@@ -11,7 +11,7 @@ import {
   deleteOrganization,
   getOrganizations,
   Organization,
-} from "@/lib/organization";
+} from "@/lib/organization/organization";
 import { useloadingStore } from "@/store/loadingStore";
 import { formatDate } from "@/lib/utils";
 import CreateEditOrganizationsModal from "./components/CreateEditOrganizationsModal";

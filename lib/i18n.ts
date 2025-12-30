@@ -1,4 +1,4 @@
-export type Language = "en" | "es"
+export type Language = "en" | "es";
 
 export const translations = {
   en: {
@@ -12,7 +12,8 @@ export const translations = {
 
     // Landing
     hero_title: "Control Every Command. Protect Every Connection.",
-    hero_subtitle: "Enterprise remote access management platform for DevOps teams",
+    hero_subtitle:
+      "Enterprise remote access management platform for DevOps teams",
     get_started: "Get Started",
     learn_more: "Learn More",
 
@@ -68,7 +69,7 @@ export const translations = {
     // Profile
     profile: "Profile",
     back_to_home: "Back to Home",
-    
+
     // Common
     edit: "Edit",
     delete: "Delete",
@@ -93,11 +94,25 @@ export const translations = {
     validation_email_invalid: "Invalid email format",
     validation_password_required: "Password is required",
     validation_password_min: "Password must be at least 8 characters",
-    validation_password_uppercase: "Password must contain at least one uppercase letter",
-    validation_password_lowercase: "Password must contain at least one lowercase letter",
+    validation_password_uppercase:
+      "Password must contain at least one uppercase letter",
+    validation_password_lowercase:
+      "Password must contain at least one lowercase letter",
     validation_password_number: "Password must contain at least one number",
     validation_role_required: "Role is required",
     validation_organization_required: "Organization is required",
+    validation_slug_required: "Slug is required",
+    validation_slug_min: "Slug must be at least 1 character",
+    validation_slug_max: "Slug must be at most 100 characters",
+    validation_slug_invalid:
+      "Slug must contain only lowercase letters, numbers, and hyphens",
+    validation_plan_required: "Plan is required",
+    validation_max_users_invalid:
+      "Max users must be a positive integer or null",
+    validation_max_connections_invalid:
+      "Max connections must be a positive integer or null",
+    validation_max_agents_invalid:
+      "Max agents must be a positive integer or null",
   },
   es: {
     // Navigation
@@ -110,7 +125,8 @@ export const translations = {
 
     // Landing
     hero_title: "Controla Cada Comando. Protege Cada Conexión.",
-    hero_subtitle: "Plataforma empresarial de gestión de acceso remoto para equipos DevOps",
+    hero_subtitle:
+      "Plataforma empresarial de gestión de acceso remoto para equipos DevOps",
     get_started: "Comenzar",
     learn_more: "Saber Más",
 
@@ -166,7 +182,7 @@ export const translations = {
     // Profile
     profile: "Perfil",
     back_to_home: "Volver al Inicio",
-    
+
     // Common
     edit: "Editar",
     delete: "Eliminar",
@@ -191,24 +207,39 @@ export const translations = {
     validation_email_invalid: "Formato de correo inválido",
     validation_password_required: "La contraseña es requerida",
     validation_password_min: "La contraseña debe tener al menos 8 caracteres",
-    validation_password_uppercase: "La contraseña debe contener al menos una letra mayúscula",
-    validation_password_lowercase: "La contraseña debe contener al menos una letra minúscula",
-    validation_password_number: "La contraseña debe contener al menos un número",
+    validation_password_uppercase:
+      "La contraseña debe contener al menos una letra mayúscula",
+    validation_password_lowercase:
+      "La contraseña debe contener al menos una letra minúscula",
+    validation_password_number:
+      "La contraseña debe contener al menos un número",
     validation_role_required: "El rol es requerido",
     validation_organization_required: "La organización es requerida",
+    validation_slug_required: "El slug es requerido",
+    validation_slug_min: "El slug debe tener al menos 1 carácter",
+    validation_slug_max: "El slug debe tener como máximo 100 caracteres",
+    validation_slug_invalid:
+      "El slug solo debe contener letras minúsculas, números y guiones",
+    validation_plan_required: "El plan es requerido",
+    validation_max_users_invalid:
+      "El máximo de usuarios debe ser un entero positivo o null",
+    validation_max_connections_invalid:
+      "El máximo de conexiones debe ser un entero positivo o null",
+    validation_max_agents_invalid:
+      "El máximo de agentes debe ser un entero positivo o null",
   },
-}
+};
 
 export function getLanguage(): Language {
-  if (typeof window === "undefined") return "en"
-  return (localStorage.getItem("trident_language") as Language) || "en"
+  if (typeof window === "undefined") return "en";
+  return (localStorage.getItem("trident_language") as Language) || "en";
 }
 
 export function setLanguage(lang: Language): void {
-  localStorage.setItem("trident_language", lang)
+  localStorage.setItem("trident_language", lang);
 }
 
 export function t(key: keyof typeof translations.en): string {
-  const lang = getLanguage()
-  return translations[lang][key] || translations.en[key]
+  const lang = getLanguage();
+  return translations[lang][key] || translations.en[key];
 }

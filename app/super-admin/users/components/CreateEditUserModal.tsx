@@ -1,13 +1,10 @@
 "use  client";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import { createUser, CreateUser, updateUser, User } from "@/lib/user/user";
 import { Role } from "@/lib/role";
-import { Organization } from "@/lib/organization";
-
+import { Organization } from "@/lib/organization/organization";
 import { useloadingStore } from "@/store/loadingStore";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectSearch } from "@/components/ui/select-search";
 import { useForm } from "react-hook-form";
-import { CreateUserFormData, getCreateUserSchema, getUpdateUserSchema, UpdateUserFormData } from "@/lib/user/user.schema";
+import {
+  CreateUserFormData,
+  getCreateUserSchema,
+  getUpdateUserSchema,
+  UpdateUserFormData,
+} from "@/lib/user/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormError } from "@/components/ui/form-error";
 
@@ -60,7 +62,9 @@ export default function CreateEditUserModal({
     setValue,
     watch,
   } = useForm<CreateUserFormData | UpdateUserFormData>({
-    resolver: zodResolver(isEditing ? getUpdateUserSchema() : getCreateUserSchema()),
+    resolver: zodResolver(
+      isEditing ? getUpdateUserSchema() : getCreateUserSchema()
+    ),
     mode: "onBlur", // Validates when field loses focus
     defaultValues: {
       name: "",
@@ -71,12 +75,11 @@ export default function CreateEditUserModal({
     },
   });
 
-
   const { mutate, isPending } = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
       setIsOpen(false);
-      reset()
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["users"],
       });
@@ -86,7 +89,7 @@ export default function CreateEditUserModal({
     mutationFn: updateUser,
     onSuccess: () => {
       setIsOpen(false);
-      reset()
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["users"],
       });
@@ -95,18 +98,22 @@ export default function CreateEditUserModal({
 
   const onSubmit = (data: CreateUserFormData | UpdateUserFormData) => {
     if (!isEditing) {
-      mutate(data as CreateUserFormData)
-      return
+      mutate(data as CreateUserFormData);
+      return;
     }
     updateMutate({
       id: editingUser?.id ?? "",
       ...(data.password?.trim() !== "" ? { password: data.password } : {}),
       ...(data.name !== editingUser?.name ? { name: data.name } : {}),
       ...(data.email !== editingUser?.email ? { email: data.email } : {}),
-      ...(data.organization_id !== editingUser?.organization_id ? { organization_id: data.organization_id } : {}),
-      ...(data.role_id !== editingUser?.role_id ? { role_id: data.role_id } : {}),
-    })
-  }
+      ...(data.organization_id !== editingUser?.organization_id
+        ? { organization_id: data.organization_id }
+        : {}),
+      ...(data.role_id !== editingUser?.role_id
+        ? { role_id: data.role_id }
+        : {}),
+    });
+  };
 
   // Watch select values
   const roleId = watch("role_id");
@@ -120,7 +127,7 @@ export default function CreateEditUserModal({
   // Manage form state when editing user
   // Reset form when edit mode changes
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     if (!isEditing || !editingUser) {
       reset({
         name: "",
@@ -129,8 +136,7 @@ export default function CreateEditUserModal({
         role_id: "",
         organization_id: "",
       });
-      return
-
+      return;
     }
     reset({
       name: editingUser.name,
@@ -191,7 +197,9 @@ export default function CreateEditUserModal({
                   value: role.id,
                 })) ?? []
               }
-              onValueChange={(value) => setValue("role_id", value, { shouldValidate: true })}
+              onValueChange={(value) =>
+                setValue("role_id", value, { shouldValidate: true })
+              }
               value={roleId}
               error={!!errors.role_id}
             />

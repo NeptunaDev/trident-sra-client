@@ -74,7 +74,9 @@ export function SuperAdminSidebar() {
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
               "hover:bg-[#1a1a2e] hover:text-[#5bc2e7]",
-              pathname === item.href || (item.href === "/super-admin/dashboard" && pathname === "/super-admin")
+              pathname === item.href ||
+                (item.href === "/super-admin/dashboard" &&
+                  pathname === "/super-admin")
                 ? "bg-[#1a1a2e] text-[#5bc2e7]"
                 : "text-[#c0c5ce]"
             )}

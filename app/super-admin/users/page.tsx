@@ -5,7 +5,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 
 import { getRoles, Role } from "@/lib/role";
-import { getOrganizations, Organization } from "@/lib/organization";
+import {
+  getOrganizations,
+  Organization,
+} from "@/lib/organization/organization";
 import { formatDate } from "@/lib/utils";
 import { deleteUser, getUser, User } from "@/lib/user/user";
 
@@ -132,10 +135,13 @@ export default function UsersCrudPage() {
                     <td className="py-3 px-4 text-white font-medium">
                       {it?.name ?? ""}
                     </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it?.email ?? ""}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      {it?.email ?? ""}
+                    </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
                       {organizations?.find(
-                        (organization) => organization.id === it?.organization_id
+                        (organization) =>
+                          organization.id === it?.organization_id
                       )?.name || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
@@ -189,7 +195,9 @@ export default function UsersCrudPage() {
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         title={"Confirm delete"}
-        description={`¿Estás seguro de que deseas eliminar el usuario "${deletingUser?.name ?? ""}"? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de que deseas eliminar el usuario "${
+          deletingUser?.name ?? ""
+        }"? Esta acción no se puede deshacer.`}
         confirmText={"Delete"}
         cancelText={"Cancel"}
         variant="destructive"
