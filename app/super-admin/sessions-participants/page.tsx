@@ -132,7 +132,7 @@ export default function SessionsParticipantsCrudPage() {
                     className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]"
                   >
                     <td className="py-3 px-4 text-white font-medium">
-                      {it.id.split("-")[0]}
+                      {it.id?.split("-")[0]}
                     </td>
                     <td className="py-3 px-4">
                       <Badge
@@ -155,7 +155,7 @@ export default function SessionsParticipantsCrudPage() {
                       </Badge>
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.join_at)}
+                      {it.join_at ? formatDate(it.join_at) : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <Badge
@@ -172,10 +172,10 @@ export default function SessionsParticipantsCrudPage() {
                       </Badge>
                     </td>
                     <td className="py-3 px-4 text-white font-medium">
-                      {it.session_id.split("-")[0]}
+                      {it.session_id?.split("-")[0] || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.user_id.split("-")[0]}
+                      {it.user_id?.split("-")[0] || "-"}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
