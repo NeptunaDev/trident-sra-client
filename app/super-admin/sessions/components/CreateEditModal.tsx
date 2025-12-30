@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { createSession, updateSession, CreateSession, Session } from "@/lib/session"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 import { getConnections } from "@/lib/connections"
 
 import { useloadingStore } from "@/store/loadingStore"

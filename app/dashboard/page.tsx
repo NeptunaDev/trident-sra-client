@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
 import { useQuery } from "@tanstack/react-query"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 
 export default function DashboardPage() {
   const router = useRouter()

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Upload, Save, User, Mail, Shield, Calendar } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 
 export default function ProfilePage() {
   const { data: user } = useQuery({

@@ -19,6 +19,7 @@ export type SelectSearchProps = {
   disabled?: boolean
   className?: string
   triggerClassName?: string
+  error?: boolean
 }
 
 export function SelectSearch({
@@ -31,6 +32,7 @@ export function SelectSearch({
   disabled,
   className,
   triggerClassName,
+  error,
 }: SelectSearchProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
@@ -54,6 +56,7 @@ export function SelectSearch({
             "bg-[#11111f] border border-[rgba(91,194,231,0.2)] text-white",
             "hover:bg-[#0f0f1c] focus:outline-none focus:ring-2 focus:ring-[#5bc2e7]/40 focus:border-[#5bc2e7]",
             "disabled:opacity-50 disabled:cursor-not-allowed",
+            error && "border-red-500 focus:ring-red-500/20",
             triggerClassName,
           )}
         >

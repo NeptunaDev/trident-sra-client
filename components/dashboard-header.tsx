@@ -18,7 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 import { LanguageSwitcher } from "./language-switcher"
 import { translations, getLanguage, type Language } from "@/lib/i18n"
 import { useQuery } from "@tanstack/react-query"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 import { useAuthStore } from "@/store/authStore"
 
 export function DashboardHeader() {

@@ -6,7 +6,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react"
 
 import { getOrganizations } from "@/lib/organization"
 import { Policy, getPolicies, deletePolicy } from "@/lib/policy"
-import { getUser } from "@/lib/user"
+import { getUser } from "@/lib/user/user"
 import { formatDate } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"

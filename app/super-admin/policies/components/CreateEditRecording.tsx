@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { createPolicy, updatePolicy, CreatePolicy, Policy } from "@/lib/policy"
 import { Organization } from "@/lib/organization"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser } from "@/lib/user/user"
 
 import { useloadingStore } from "@/store/loadingStore"
 
