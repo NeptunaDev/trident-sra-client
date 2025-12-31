@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api } from "../axios";
 
 export interface Session {
   id: string;
@@ -20,12 +20,12 @@ export interface CreateSession {
   public_session_id: string;
   connection_id: string;
   initiated_by_user_id: string;
-  recording_enabled: boolean;
-  status: string;
-  duration_seconds: number;
-  recording_url: string;
-  total_commands: number;
-  blocked_commands: number;
+  recording_enabled?: boolean;
+  status?: string;
+  duration_seconds?: number;
+  recording_url?: string;
+  total_commands?: number;
+  blocked_commands?: number;
 }
 
 export interface UpdateSession extends Partial<CreateSession> {

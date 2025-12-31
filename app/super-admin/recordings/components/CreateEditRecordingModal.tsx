@@ -1,10 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { FormError } from "@/components/ui/form-error"
+import { CreateSessionRecordingFormData, UpdateSessionRecordingFormData, getCreateSessionRecordingSchema, getUpdateSessionRecordingSchema } from "@/lib/Recording/recording.schema"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import { createSessionRecording, updateSessionRecording, CreateSessionRecording, SessionRecording } from "@/lib/session_recording"
-import { getSession } from "@/lib/session"
+import { createSessionRecording, updateSessionRecording, SessionRecording } from "@/lib/Recording/session_recording"
+import { getSession } from "@/lib/Session/session"
 import { getCurrentUser } from "@/lib/user/user"
 
 import { useloadingStore } from "@/store/loadingStore"
@@ -28,22 +32,30 @@ const STATUS_OPTIONS = [
   { label: "Failed", value: "failed" },
 ] 
 
-const INITIAL_FORM: CreateSessionRecording = {
-  session_id: "",
-  file_url: "",
-  file_name: "",
-  file_size_bytes: 0,
-  duration_seconds: 0,
-  status: "pending",
-}
-
 export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRecording }: CreateEditRecordingModalProps) {
     const isEditing = !!editingRecording
-    const [disabled, setDisabled] = useState(false)
-    const [form, setForm] = useState<CreateSessionRecording>(INITIAL_FORM)
-
-    const { isLoading, setIsLoading } = useloadingStore()
+    const { setIsLoading } = useloadingStore()
     const queryClient = useQueryClient()
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+        reset,
+        setValue,
+        watch,
+    } = useForm<CreateSessionRecordingFormData>({
+        resolver: zodResolver(isEditing ? getUpdateSessionRecordingSchema() : getCreateSessionRecordingSchema()) as any,
+        mode: "onBlur",
+        defaultValues: {
+            session_id: "",
+            file_url: "",
+            file_name: "",
+            file_size_bytes: 0,
+            duration_seconds: 0,
+            status: "pending",
+        }
+    })
 
     const { data: currentUser } = useQuery({
         queryKey: ["currentUser"],
@@ -59,7 +71,7 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
         mutationFn: createSessionRecording,
         onSuccess: () => {
             setIsOpen(false)
-            setForm(INITIAL_FORM)
+            reset()
             queryClient.invalidateQueries({
                 queryKey: ["session_recordings"]
             })
@@ -74,7 +86,7 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
         mutationFn: updateSessionRecording,
         onSuccess: () => {
             setIsOpen(false)
-            setForm(INITIAL_FORM)
+            reset()
             queryClient.invalidateQueries({
                 queryKey: ["session_recordings"]
             })
@@ -85,60 +97,54 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
         }
     }) 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }))
+    const onSubmit = (data: CreateSessionRecordingFormData) => {
+        if (!isEditing) {
+            mutate(data)
+            return
+        }
+        updateMutate({
+            id: editingRecording?.id ?? "",
+            ...(data.session_id !== editingRecording?.session_id ? { session_id: data.session_id } : {}),
+            ...(data.file_url !== editingRecording?.file_url ? { file_url: data.file_url } : {}),
+            ...(data.file_name !== editingRecording?.file_name ? { file_name: data.file_name } : {}),
+            ...(Number(data.file_size_bytes) !== Number(editingRecording?.file_size_bytes) ? { file_size_bytes: Number(data.file_size_bytes) } : {}),
+            ...(Number(data.duration_seconds) !== Number(editingRecording?.duration_seconds) ? { duration_seconds: Number(data.duration_seconds) } : {}),
+            ...(data.status !== editingRecording?.status ? { status: data.status } : {}),
+        })
     }
-    const handleSave = () => {
-        if (!currentUser) return
-        
-        if (isEditing) {
-            updateMutate({
-                id: editingRecording?.id ?? "",
-                ...(form.session_id !== editingRecording.session_id ? { session_id: form.session_id } : {}),
-                ...(form.file_url !== editingRecording.file_url ? { file_url: form.file_url } : {}),
-                ...(form.file_name !== editingRecording.file_name ? { file_name: form.file_name } : {}),
-                ...(Number(form.file_size_bytes) !== Number(editingRecording.file_size_bytes) ? { file_size_bytes: Number(form.file_size_bytes) } : {}),
-                ...(Number(form.duration_seconds) !== Number(editingRecording.duration_seconds) ? { duration_seconds: Number(form.duration_seconds) } : {}),
-                ...(form.status !== editingRecording.status ? { status: form.status } : {}),
+
+    // Watch select values
+    const sessionId = watch("session_id")
+    const status = watch("status")
+
+    // Manage loading state
+    useEffect(() => {
+        setIsLoading(isPending || isUpdatePending)
+    }, [isPending, isUpdatePending, setIsLoading])
+
+    // Reset form when edit mode changes
+    useEffect(() => {
+        if (!isOpen) return
+        if (!isEditing || !editingRecording) {
+            reset({
+                session_id: "",
+                file_url: "",
+                file_name: "",
+                file_size_bytes: 0,
+                duration_seconds: 0,
+                status: "pending",
             })
             return
         }
-        mutate(form)
-    }  
-    useEffect(() => {
-        Object.values(form).forEach((value) => {
-            if (value.toString().trim() === "") {
-                setDisabled(true)
-                return
-            }
+        reset({
+            session_id: editingRecording.session_id ?? "",
+            file_url: editingRecording.file_url ?? "",
+            file_name: editingRecording.file_name ?? "",
+            file_size_bytes: Number(editingRecording.file_size_bytes) ?? 0,
+            duration_seconds: Number(editingRecording.duration_seconds) ?? 0,
+            status: editingRecording.status ?? "pending",
         })
-        setDisabled(false)
-    }, [form])
-
-    useEffect(() => {
-        if (isPending !== isLoading || isUpdatePending !== isLoading ){
-            setIsLoading(isPending || isUpdatePending)
-        }
-    }, [isPending, isUpdatePending])
-
-    useEffect(() => {
-        if (!isEditing) {
-            setForm(INITIAL_FORM)
-            return
-        }
-        setForm({
-            session_id: editingRecording!.session_id,
-            file_url: editingRecording!.file_url,
-            file_name: editingRecording!.file_name,
-            file_size_bytes: Number(editingRecording!.file_size_bytes) ,
-            duration_seconds: Number(editingRecording!.duration_seconds),
-            status: editingRecording!.status,
-        })
-    }, [editingRecording, isEditing])
+    }, [isOpen, isEditing, editingRecording, reset])
     
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -146,86 +152,87 @@ export default function CreateEditRecordingModal({ isOpen, setIsOpen, editingRec
                 <DialogHeader>
                     <DialogTitle className="text-white">{isEditing ? "Edit" : "Create"} Recording</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
                         <Label className="text-[#c0c5ce]">Session</Label>
                         <SelectSearch
                             items={sessions?.map((session) => ({ label: session.public_session_id, value: session.id })) ?? []}
-                            value={form.session_id}
-                            onValueChange={(value) => setForm((prev) => ({ ...prev, session_id: value }))}
+                            value={sessionId}
+                            onValueChange={(value) => setValue("session_id", value, { shouldValidate: true })}
+                            error={!!errors.session_id}
                         />
+                        <FormError message={errors.session_id?.message} />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#c0c5ce]">File URL</Label>
                         <Input
-                            name="file_url"
-                            value={form.file_url}
-                            onChange={handleChange}
+                            {...register("file_url")}
+                            error={!!errors.file_url}
                             placeholder="https://example.com/recordings/file.mp4"
                             className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                         />
+                        <FormError message={errors.file_url?.message} />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#c0c5ce]">File Name</Label>
                         <Input
-                            name="file_name"
-                            value={form.file_name}
-                            onChange={handleChange}
+                            {...register("file_name")}
+                            error={!!errors.file_name}
                             placeholder="recording_2025-12-22.mp4"
                             className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                         />
+                        <FormError message={errors.file_name?.message} />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-[#c0c5ce]">File Size (MB)</Label>
+                        <Label className="text-[#c0c5ce]">File Size (bytes)</Label>
                         <Input
-                            name="file_size_mb"
-                            type="text"
-                            value={(form.file_size_bytes / (1024 * 1024)).toFixed(4)}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/[^0-9.]/g, '')
-                                const mb = parseFloat(value) || 0
-                                const bytes = Math.round(mb * 1024 * 1024)
-                                setForm((prev) => ({ ...prev, file_size_bytes: bytes }))
-                            }}
-                            placeholder="5.50"
+                            {...register("file_size_bytes", { valueAsNumber: true })}
+                            error={!!errors.file_size_bytes}
+                            type="number"
+                            placeholder="1024000"
                             className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                         />
+                        <FormError message={errors.file_size_bytes?.message} />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#c0c5ce]">Duration (seconds)</Label>
                         <Input
-                            name="duration_seconds"
-                            type="text"
-                            value={form.duration_seconds.toString()}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, '')
-                                setForm((prev) => ({ ...prev, duration_seconds: value ? parseInt(value) : 0 }))
-                            }}
+                            {...register("duration_seconds", { valueAsNumber: true })}
+                            error={!!errors.duration_seconds}
+                            type="number"
                             placeholder="300"
                             className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
                         />
+                        <FormError message={errors.duration_seconds?.message} />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#c0c5ce]">Status</Label>
                         <SelectSearch
                             items={STATUS_OPTIONS}
-                            value={form.status}
-                            onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
+                            value={status}
+                            onValueChange={(value) => setValue("status", value, { shouldValidate: true })}
+                            error={!!errors.status}
                         />
+                        <FormError message={errors.status?.message} />
                     </div>
-                </div>
-                <DialogFooter className="gap-2">
-                    <Button variant="ghost" onClick={() => setIsOpen(false)} className="text-white hover:bg-[#11111f]">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={disabled}
-                        className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
-                    >
-                        {isEditing ? "Update" : "Create"}
-                    </Button>
-                </DialogFooter>
+                    <DialogFooter className="gap-2">
+                        <Button 
+                            type="button"
+                            variant="ghost" 
+                            onClick={() => setIsOpen(false)} 
+                            className="text-white hover:bg-[#11111f]"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={isPending || isUpdatePending || !isValid}
+                            className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
+                        >
+                            {isEditing ? "Update" : "Create"}
+                        </Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
     )

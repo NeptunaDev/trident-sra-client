@@ -1,11 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-import { createConnection, updateConnection, CreateConnection, Connection } from "@/lib/connections"
+import { createConnection, updateConnection, CreateConnection, Connection } from "@/lib/Connection/connections"
 import { Organization } from "@/lib/organization"
 import { getCurrentUser } from "@/lib/user/user"
+import { CreateConnectionFormData, UpdateConnectionFormData, getCreateConnectionSchema, getUpdateConnectionSchema } from "@/lib/Connection/connections.schema"
 
 import { useloadingStore } from "@/store/loadingStore"
 
@@ -14,6 +17,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SelectSearch } from "@/components/ui/select-search"
+import { FormError } from "@/components/ui/form-error"
 
 interface CreateEditConnectionModalProps {
   isOpen: boolean
@@ -34,127 +38,135 @@ const STATUS_OPTIONS = [
   { label: "Inactive", value: "inactive" },
 ]
 
-const INITIAL_FORM: CreateConnection = {
-  organization_id: "",
-  create_by_user_id: "",
-  name: "",
-  protocol: "ssh",
-  hostname: "",
-  port: 22,
-  username: "",
-  password: "",
-  description: "",
-  status: "active",
-  total_sessions: 0,
-}
-
-export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizations, editingConnection }: CreateEditConnectionModalProps) {
+export default function CreateEditConnectionModal({ 
+  isOpen, 
+  setIsOpen, 
+  organizations, 
+  editingConnection 
+}: CreateEditConnectionModalProps) {
   const isEditing = !!editingConnection
-  const [disabled, setDisabled] = useState(false)
-  const [form, setForm] = useState<CreateConnection>(INITIAL_FORM)
-
   const { isLoading, setIsLoading } = useloadingStore()
   const queryClient = useQueryClient()
 
+  // Use the correct schema based on whether we're editing or creating
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+    setValue,
+    watch,
+  } = useForm<CreateConnectionFormData | UpdateConnectionFormData>({
+    resolver: zodResolver(isEditing ? getUpdateConnectionSchema() : getCreateConnectionSchema()),
+    mode: "onBlur", // Validates when field loses focus
+    defaultValues: {
+      name: "",
+      protocol: "ssh",
+      hostname: "",
+      port: 22,
+      username: "",
+      password: "",
+      organization_id: "",
+      description: "",
+      status: "active",
+    },
+  })
+  
   const { mutate, isPending } = useMutation({
-    mutationFn: createConnection,
+    mutationFn: async (data: CreateConnectionFormData) => {
+      const user = await getCurrentUser()
+      return createConnection({
+        name: data.name,
+        protocol: data.protocol,
+        hostname: data.hostname,
+        port: data.port ?? 22, //default port
+        username: data.username,
+        password: data.password,
+        organization_id: data.organization_id,
+        create_by_user_id: user.id,
+        total_sessions: 0,
+        ...(data.description ? { description: data.description } : {}),
+        ...(data.status ? { status: data.status } : {}),
+      })
+    },
     onSuccess: () => {
       setIsOpen(false)
-      setForm(INITIAL_FORM)
+      reset()
       queryClient.invalidateQueries({
         queryKey: ["connections"]
       })
     },
-    onError: (error: any) => {
-      console.error('Create error:', error)
-      alert(error.response?.data?.detail || error.message || 'Failed to create connection')
-    }
   })
-
   const { mutate: updateMutate, isPending: isUpdatePending } = useMutation({
     mutationFn: updateConnection,
     onSuccess: () => {
       setIsOpen(false)
-      setForm(INITIAL_FORM)
+      reset()
       queryClient.invalidateQueries({
         queryKey: ["connections"]
       })
     },
-    onError: (error: any) => {
-      console.error('Update error:', error)
-      alert(error.response?.data?.detail || error.message || 'Failed to update connection')
-    }
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+  const onSubmit = (data: CreateConnectionFormData | UpdateConnectionFormData) => {
+    if (!isEditing) {
+      mutate(data as CreateConnectionFormData)
+      return
+    }
+    updateMutate({
+      id: editingConnection?.id ?? "",
+      ...(data.password?.trim() !== "" ? { password: data.password } : {}),
+      ...(data.name !== editingConnection?.name ? { name: data.name } : {}),
+      ...(data.protocol !== editingConnection?.protocol ? { protocol: data.protocol } : {}),
+      ...(data.hostname !== editingConnection?.hostname ? { hostname: data.hostname } : {}),
+      ...(data.port !== editingConnection?.port ? { port: data.port ?? 22 } : {}),
+      ...(data.username !== editingConnection?.username ? { username: data.username } : {}),
+      ...(data.organization_id !== editingConnection?.organization_id ? { organization_id: data.organization_id } : {}),
+      ...(data.description !== editingConnection?.description ? { description: data.description } : {}),
+      ...(data.status !== editingConnection?.status ? { status: data.status } : {}),
+    })
   }
 
-  const handleSave = () => {
-    if (isEditing) {
-      updateMutate({
-        id: editingConnection?.id ?? "",
-        ...(form.password.trim() !== "" ? { password: form.password } : {}),
-        ...(form.name !== editingConnection.name ? { name: form.name } : {}),
-        ...(form.protocol !== editingConnection.protocol ? { protocol: form.protocol } : {}),
-        ...(form.hostname !== editingConnection.hostname ? { hostname: form.hostname } : {}),
-        ...(form.port !== editingConnection.port ? { port: form.port } : {}),
-        ...(form.username !== editingConnection.username ? { username: form.username } : {}),
-        ...(form.organization_id !== editingConnection.organization_id ? { organization_id: form.organization_id } : {}),
-        ...(form.description !== editingConnection.description ? { description: form.description } : {}),
-        ...(form.status !== editingConnection.status ? { status: form.status } : {}),
+  // Watch select values
+  const protocol = watch("protocol")
+  const organizationId = watch("organization_id")
+  const status = watch("status")
+
+  // Manage loading state
+  useEffect(() => {
+    setIsLoading(isPending || isUpdatePending)
+  }, [isPending, isUpdatePending, setIsLoading])
+
+  // Manage form state when editing connection
+  // Reset form when edit mode changes
+  useEffect(() => {
+    if (!isOpen) return
+    if (!isEditing || !editingConnection) {
+      reset({
+        name: "",
+        protocol: "ssh",
+        hostname: "",
+        port: 22,
+        username: "",
+        password: "",
+        organization_id: "",
+        description: "",
+        status: "active",
       })
       return
     }
-    mutate(form)
-  }
-
-  // Management the state the disabled
-  useEffect(() => {
-    Object.values(form).forEach((value) => {
-      if (value.toString().trim() === "") {
-        setDisabled(true)
-        return
-      }
-    })
-    setDisabled(false)
-  }, [form])
-
-  // Management the state the loading
-  useEffect(() => {
-    if (isPending !== isLoading || isUpdatePending !== isLoading) {
-      setIsLoading(isPending || isUpdatePending)
-    }
-  }, [isPending, isUpdatePending])
-
-  // Management the state the editing connection
-  useEffect(() => {
-    if (!isEditing) {
-      setForm(INITIAL_FORM)
-      // fill create_by_user_id when creating new connection
-      getCurrentUser().then((user) => {
-        setForm((prev) => ({ ...prev, create_by_user_id: user.id }))
-      }).catch(console.error)
-      return
-    }
-    setForm({
-      organization_id: editingConnection?.organization_id ?? "",
-      create_by_user_id: editingConnection?.create_by_user_id ?? "",
-      name: editingConnection?.name ?? "",
-      protocol: editingConnection?.protocol ?? "ssh",
-      hostname: editingConnection?.hostname ?? "",
-      port: editingConnection?.port ?? 22,
-      username: editingConnection?.username ?? "",
+    reset({
+      name: editingConnection.name,
+      protocol: editingConnection.protocol,
+      hostname: editingConnection.hostname,
+      port: editingConnection.port,
+      username: editingConnection.username,
       password: "",
-      description: editingConnection?.description ?? "",
-      status: editingConnection?.status ?? "active",
-      total_sessions: editingConnection?.total_sessions ?? 0,
+      organization_id: editingConnection.organization_id,
+      description: editingConnection.description ?? "",
+      status: editingConnection.status,
     })
-  }, [editingConnection, isEditing])
+  }, [isOpen, isEditing, editingConnection, reset])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -162,109 +174,117 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
         <DialogHeader>
           <DialogTitle className="text-white">{isEditing ? "Edit" : "Create"} Connection</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Name</Label>
             <Input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
+              {...register("name")}
+              error={!!errors.name}
               placeholder="My Server Connection"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.name?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Protocol</Label>
             <SelectSearch
               items={PROTOCOL_OPTIONS}
-              value={form.protocol}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, protocol: value }))}
+              value={protocol}
+              onValueChange={(value) => setValue("protocol", value, { shouldValidate: true })}
+              error={!!errors.protocol}
             />
+            <FormError message={errors.protocol?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Hostname</Label>
             <Input
-              name="hostname"
-              value={form.hostname}
-              onChange={handleChange}
+              {...register("hostname")}
+              error={!!errors.hostname}
               placeholder="192.168.1.100 or server.example.com"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.hostname?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Port</Label>
             <Input
-              name="port"
-              type="text"
-              value={form.port.toString()}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, '')
-                setForm((prev) => ({ ...prev, port: value ? parseInt(value) : 0 }))
-              }}
+              {...register("port", { valueAsNumber: true })}
+              error={!!errors.port}
+              type="number"
               placeholder="22"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.port?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Username</Label>
             <Input
-              name="username"
-              value={form.username}
-              onChange={handleChange}
-              placeholder="admin user"
+              {...register("username")}
+              error={!!errors.username}
+              placeholder="admin"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.username?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Password</Label>
             <Input
+              {...register("password")}
+              error={!!errors.password}
               type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
               placeholder="••••••••"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.password?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Organization</Label>
             <SelectSearch
               items={organizations?.map((organization) => ({ label: organization.name, value: organization.id })) ?? []}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, organization_id: value }))}
-              value={form.organization_id}
+              onValueChange={(value) => setValue("organization_id", value, { shouldValidate: true })}
+              value={organizationId}
+              error={!!errors.organization_id}
             />
+            <FormError message={errors.organization_id?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Status</Label>
             <SelectSearch
               items={STATUS_OPTIONS}
-              value={form.status}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
+              value={status}
+              onValueChange={(value) => setValue("status", value, { shouldValidate: true })}
+              error={!!errors.status}
             />
+            <FormError message={errors.status?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Description (optional)</Label>
             <Input
-              name="description"
-              value={form.description}
-              onChange={handleChange}
+              {...register("description")}
+              error={!!errors.description}
               placeholder="Optional description"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.description?.message} />
           </div>
-        </div>
-        <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => setIsOpen(false)} className="text-white hover:bg-[#11111f]">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={disabled}
-            className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
-          >
-            {isEditing ? "Update" : "Create"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsOpen(false)}
+              className="text-white hover:bg-[#11111f]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending || isUpdatePending || !isValid}
+              className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
+            >
+              {isEditing ? "Update" : "Create"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

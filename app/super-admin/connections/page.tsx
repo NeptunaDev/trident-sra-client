@@ -6,7 +6,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react"
 
 import { getOrganizations } from "@/lib/organization"
 import { formatDate } from "@/lib/utils"
-import { deleteConnection, getConnections, Connection } from "@/lib/connections"
+import { deleteConnection, getConnections, Connection } from "@/lib/Connection/connections"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -115,28 +115,29 @@ export default function ConnectionsCrudPage() {
                 </tr>
               ) : (
                 connections?.map((it) => (
-                  <tr key={it.id} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
-                    <td className="py-3 px-4 text-white font-medium">{it.id.split("-")[0]}</td>
-                    <td className="py-3 px-4 text-white font-medium">{it.name}</td>
+                  <tr key={it?.id ?? ""} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
+                    <td className="py-3 px-4 text-white font-medium">
+                      {it?.id?.split("-")[0]}</td>
+                    <td className="py-3 px-4 text-white font-medium">{it?.name ?? ""}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      <span className="uppercase">{it.protocol}</span>
+                      <span className="uppercase">{it?.protocol ?? ""}</span>
                     </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.hostname}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.port}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.username}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it?.hostname ?? ""}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it?.port ?? ""}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it?.username ?? ""}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {organizations?.find((org) => org.id === it.organization_id)?.name || "-"}
+                      {organizations?.find((org) => org.id === it?.organization_id)?.name || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      <span className="capitalize">{it.status}</span>
+                      <span className="capitalize">{it?.status ?? ""}</span>
                     </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.created_at)}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it?.created_at ?? "")}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(it)}
+                          onClick={() => handleEdit(it ?? null)}
                           className="text-white hover:text-[#5bc2e7] hover:bg-[#0f0f1c]"
                         >
                           <Pencil className="w-4 h-4 mr-2" />
@@ -145,7 +146,7 @@ export default function ConnectionsCrudPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(it)}
+                          onClick={() => handleDelete(it ?? null)}
                           className="text-white hover:text-white hover:bg-[#ff6b6b]"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />

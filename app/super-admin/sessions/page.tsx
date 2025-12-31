@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import { useMutation,useQuery, useQueryClient } from "@tanstack/react-query"
 import {  Pencil, Plus, Trash2 } from "lucide-react"
 
-import { getConnections } from "@/lib/connections"
-import { getSession, deleteSession, Session } from "@/lib/session"
+import { getConnections } from "@/lib/Connection/connections"
+import { getSession, deleteSession, Session } from "@/lib/Session/session"
 import { formatDate } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
@@ -106,34 +106,34 @@ export default function SessionsCrudPage() {
                 </tr>
               ) : (
                 sessions?.map((it) => (
-                  <tr key={it.id} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
-                    <td className="py-3 px-4 text-white font-medium">{it.id.split("-")[0]}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.public_session_id}</td>
+                  <tr key={it?.id ?? ""} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
+                    <td className="py-3 px-4 text-white font-medium">{it?.id?.split("-")[0] ?? ""}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{it?.public_session_id ?? "-"}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {connections?.find((conn) => conn.id === it.connection_id)?.name || "-"}
+                      {connections?.find((conn) => conn.id === it?.connection_id)?.name || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      <span className="capitalize">{it.status}</span>
+                      <span className="capitalize">{it?.status ?? "-"}</span>
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.recording_enabled ? "Yes" : "No"}
+                      {it?.recording_enabled ? "Yes" : "No"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.duration_seconds !== null && it.duration_seconds !== undefined ? `${it.duration_seconds}s` : "0s"}
+                      {it?.duration_seconds !== null && it?.duration_seconds !== undefined ? `${it?.duration_seconds}s` : "0s"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.total_commands ?? 0}
+                      {it?.total_commands ?? 0}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.blocked_commands ?? 0}
+                      {it?.blocked_commands ?? 0}
                     </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.started_at)}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it?.started_at ?? "")}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(it)}
+                          onClick={() => handleEdit(it ?? null)}
                           className="text-white hover:text-[#5bc2e7] hover:bg-[#0f0f1c]"
                         >
                           <Pencil className="w-4 h-4 mr-2" />
@@ -142,7 +142,7 @@ export default function SessionsCrudPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(it)}
+                          onClick={() => handleDelete(it ?? null)}
                           className="text-white hover:text-white hover:bg-[#ff6b6b]"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
