@@ -7,7 +7,7 @@ import {
   deleteSessionParticipant,
   getSessionParticipants,
   SessionParticipant,
-} from "@/lib/sessionParticipants";
+} from "@/lib/sessionParticipants/sessionParticipants";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

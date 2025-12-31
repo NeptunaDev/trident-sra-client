@@ -132,6 +132,12 @@ export const translations = {
     validation_status_required: "Status is required",
     validation_status_min: "Status must be at least 5 characters",
     validation_status_max: "Status must be at most 50 characters",
+    validation_file_url_required: "File URL is required",
+    validation_file_url_invalid: "Invalid URL format",
+    validation_session_id_required: "Session ID is required",
+    validation_session_id_invalid: "Session ID must be a valid UUID",
+    validation_file_size_min: "File size cannot be negative",
+    validation_duration_min: "Duration cannot be negative",
   },
   es: {
     // Navigation
@@ -269,6 +275,12 @@ export const translations = {
     validation_status_required: "El estado es requerido",
     validation_status_min: "El estado debe tener al menos 5 caracteres",
     validation_status_max: "El estado debe tener como máximo 50 caracteres",
+    validation_file_url_required: "La URL del archivo es obligatoria",
+    validation_file_url_invalid: "La URL introducida no es válida",
+    validation_session_id_required: "El ID de sesión es obligatorio",
+    validation_session_id_invalid: "El ID de sesión no es un UUID válido",
+    validation_file_size_min: "El tamaño no puede ser negativo",
+    validation_duration_min: "La duración no puede ser negativa",
   },
 };
 
