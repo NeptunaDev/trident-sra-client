@@ -1,4 +1,4 @@
-import { api } from './axios'
+import { api } from '../axios'
 
 export interface SessionRecording {
     id: string,
@@ -13,10 +13,10 @@ export interface SessionRecording {
 export interface CreateSessionRecording {
     session_id: string,
     file_url : string,
-    file_name : string,
-    file_size_bytes : number, 
-    duration_seconds : number,
-    status : string,
+    file_name? : string,
+    file_size_bytes? : number, 
+    duration_seconds? : number,
+    status? : string,
 } 
 
 export interface UpdateSessionRecording extends Partial<CreateSessionRecording> {

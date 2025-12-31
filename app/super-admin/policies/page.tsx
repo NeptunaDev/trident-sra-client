@@ -5,14 +5,14 @@ import { useMutation,useQuery, useQueryClient } from "@tanstack/react-query"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 
 import { getOrganizations } from "@/lib/organization"
-import { Policy, getPolicies, deletePolicy } from "@/lib/policy"
+import { Policy, getPolicies, deletePolicy } from "@/lib/Policy/policy"
 import { getUser } from "@/lib/user/user"
 import { formatDate } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { AlertDialog } from "@/components/ui/alert-dialog"
-import CreateEditRecording from "./components/CreateEditRecording"
+import CreateEditRecording from "./components/CreateEditPolicyModal"
 import { useloadingStore } from "@/store/loadingStore"
 
 export default function PoliciesCrudPage() {
@@ -115,29 +115,29 @@ export default function PoliciesCrudPage() {
                                 </tr>
                             ) : (
                                 policies?.map((it) => (
-                                    <tr key={it.id} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
-                                        <td className="py-3 px-4 text-white font-medium">{it.id.split("-")[0]}</td>
-                                        <td className="py-3 px-4 text-white font-medium">{it.name}</td>
+                                    <tr key={it?.id ?? ""} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
+                                        <td className="py-3 px-4 text-white font-medium">{it?.id?.split("-")[0] ?? ""}</td>
+                                        <td className="py-3 px-4 text-white font-medium">{it?.name ?? "-"}</td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {organizations?.find((org) => org.id === it.organization_id)?.name || "-"}
+                                            {organizations?.find((org) => org.id === it?.organization_id)?.name || "-"}
                                         </td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {users?.find((user) => user.id === it.created_by_user_id)?.name || "-"}
+                                            {users?.find((user) => user.id === it?.created_by_user_id)?.name || "-"}
                                         </td>
-                                        <td className="py-3 px-4 text-[#c0c5ce]">{it.blocked_patterns.join(", ")}</td>
+                                        <td className="py-3 px-4 text-[#c0c5ce]">{it?.blocked_patterns?.join(", ")}</td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {it.applies_to_roles.join(", ")}
+                                            {it?.applies_to_roles?.join(", ")}
                                         </td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {it.is_active ? "Yes" : "No"}
+                                            {it?.is_active ? "Yes" : "No"}
                                         </td>
-                                        <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.created_at)}</td>
+                                        <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it?.created_at ?? "")}</td>
                                         <td className="py-3 px-4">
                                             <div className="flex items-center gap-2">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleEdit(it)}
+                                                    onClick={() => handleEdit(it ?? null)}
                                                     className="text-white hover:text-[#5bc2e7] hover:bg-[#0f0f1c]"
                                                 >
                                                     <Pencil className="w-4 h-4 mr-2" />
@@ -146,7 +146,7 @@ export default function PoliciesCrudPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleDelete(it)}
+                                                    onClick={() => handleDelete(it ?? null)}
                                                     className="text-white hover:text-white hover:bg-[#ff6b6b]"
                                                 >
                                                     <Trash2 className="w-4 h-4 mr-2" />

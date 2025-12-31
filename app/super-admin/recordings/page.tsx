@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 
-import { SessionRecording, getSessionRecordings, deleteSessionRecording } from "@/lib/session_recording"
+import { SessionRecording, getSessionRecordings, deleteSessionRecording } from "@/lib/Recording/session_recording"
 import { formatDate } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
@@ -103,26 +103,26 @@ export default function RecordingsCrudPage() {
                                 </tr>
                             ) : (
                                 sessionRecordings?.map((it) => (
-                                    <tr key={it.id} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
-                                        <td className="py-3 px-4 text-white font-medium">{it.id.split("-")[0]}</td>
-                                        <td className="py-3 px-4 text-[#c0c5ce]">{it.session_id.split("-")[0]}</td>
-                                        <td className="py-3 px-4 text-[#c0c5ce]">{it.file_name}</td>
+                                    <tr key={it?.id ?? ""} className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]">
+                                        <td className="py-3 px-4 text-white font-medium">{it?.id?.split("-")[0]}</td>
+                                        <td className="py-3 px-4 text-[#c0c5ce]">{it?.session_id?.split("-")[0]}</td>
+                                        <td className="py-3 px-4 text-[#c0c5ce]">{it?.file_name ?? "-"}</td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {(Number(it.file_size_bytes) / (1024 * 1024)).toFixed(4)}
+                                            {(Number(it?.file_size_bytes ?? 0) / (1024 * 1024)).toFixed(4)}
                                         </td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            {it.duration_seconds}
+                                            {it?.duration_seconds ?? "-"}
                                         </td>
                                         <td className="py-3 px-4 text-[#c0c5ce]">
-                                            <span className="capitalize">{it.status}</span>
+                                            <span className="capitalize">{it?.status ?? "-"}</span>
                                         </td>
-                                        <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it.created_at)}</td>
+                                        <td className="py-3 px-4 text-[#c0c5ce]">{formatDate(it?.created_at ?? "")}</td>
                                         <td className="py-3 px-4">
                                             <div className="flex items-center gap-2">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleEdit(it)}
+                                                    onClick={() => handleEdit(it ?? null)}
                                                     className="text-white hover:text-[#5bc2e7] hover:bg-[#0f0f1c]"
                                                 >
                                                     <Pencil className="w-4 h-4 mr-2" />
@@ -131,7 +131,7 @@ export default function RecordingsCrudPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleDelete(it)}
+                                                    onClick={() => handleDelete(it ?? null)}
                                                     className="text-white hover:text-white hover:bg-[#ff6b6b]"
                                                 >
                                                     <Trash2 className="w-4 h-4 mr-2" />
