@@ -1,11 +1,11 @@
-import { api } from "./axios";
+import { api } from "../axios";
 
 export interface AuditLogs {
   id: string;
   event_type: string;
   action: string;
-  description: string;
-  status: string;
+  description: string | null;
+  status: string | null;
   details: Record<string, any> | null;
   user_id: string;
   organization_id: string;
@@ -16,11 +16,11 @@ export interface AuditLogs {
 export interface CreateAuditLogs {
   event_type: string;
   action: string;
-  description: string;
-  status: string;
+  description: string | null;
+  status: string | null;
   details: Record<string, any> | null;
-  organization_id: string;
-  user_id: string;
+  organization_id: string | null;
+  user_id: string | null;
 }
 
 export interface UpdateAuditLogs extends Partial<CreateAuditLogs> {

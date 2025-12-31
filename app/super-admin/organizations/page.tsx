@@ -11,7 +11,7 @@ import {
   deleteOrganization,
   getOrganizations,
   Organization,
-} from "@/lib/organization";
+} from "@/lib/organization/organization";
 import { useloadingStore } from "@/store/loadingStore";
 import { formatDate } from "@/lib/utils";
 import CreateEditOrganizationsModal from "./components/CreateEditOrganizationsModal";
@@ -135,7 +135,7 @@ export default function OrganizationsCrudPage() {
                     className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]"
                   >
                     <td className="py-3 px-4 text-white font-medium">
-                      {it.id.split("-")[0]}
+                      {it.id?.split("-")[0]}
                     </td>
                     <td className="py-3 px-4 text-white font-medium">
                       {it.name}
@@ -157,10 +157,10 @@ export default function OrganizationsCrudPage() {
                       {it.max_connections}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.created_at)}
+                      {it.created_at ? formatDate(it.created_at) : "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.updated_at)}
+                      {it.updated_at ? formatDate(it.updated_at) : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">

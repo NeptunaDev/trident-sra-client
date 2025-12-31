@@ -1,25 +1,36 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { createConnection, updateConnection, CreateConnection, Connection } from "@/lib/connections"
-import { Organization } from "@/lib/organization"
-import { getCurrentUser } from "@/lib/user/user"
+import {
+  createConnection,
+  updateConnection,
+  CreateConnection,
+  Connection,
+} from "@/lib/connections";
+import { Organization } from "@/lib/organization/organization";
+import { getCurrentUser } from "@/lib/user/user";
 
-import { useloadingStore } from "@/store/loadingStore"
+import { useloadingStore } from "@/store/loadingStore";
 
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { SelectSearch } from "@/components/ui/select-search"
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SelectSearch } from "@/components/ui/select-search";
 
 interface CreateEditConnectionModalProps {
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  organizations: Organization[]
-  editingConnection: Connection | null
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  organizations: Organization[];
+  editingConnection: Connection | null;
 }
 
 const PROTOCOL_OPTIONS = [
@@ -27,12 +38,12 @@ const PROTOCOL_OPTIONS = [
   { label: "RDP", value: "rdp" },
   { label: "VNC", value: "vnc" },
   { label: "Telnet", value: "telnet" },
-]
+];
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
-]
+];
 
 const INITIAL_FORM: CreateConnection = {
   organization_id: "",
@@ -46,53 +57,66 @@ const INITIAL_FORM: CreateConnection = {
   description: "",
   status: "active",
   total_sessions: 0,
-}
+};
 
-export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizations, editingConnection }: CreateEditConnectionModalProps) {
-  const isEditing = !!editingConnection
-  const [disabled, setDisabled] = useState(false)
-  const [form, setForm] = useState<CreateConnection>(INITIAL_FORM)
+export default function CreateEditConnectionModal({
+  isOpen,
+  setIsOpen,
+  organizations,
+  editingConnection,
+}: CreateEditConnectionModalProps) {
+  const isEditing = !!editingConnection;
+  const [disabled, setDisabled] = useState(false);
+  const [form, setForm] = useState<CreateConnection>(INITIAL_FORM);
 
-  const { isLoading, setIsLoading } = useloadingStore()
-  const queryClient = useQueryClient()
+  const { isLoading, setIsLoading } = useloadingStore();
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: createConnection,
     onSuccess: () => {
-      setIsOpen(false)
-      setForm(INITIAL_FORM)
+      setIsOpen(false);
+      setForm(INITIAL_FORM);
       queryClient.invalidateQueries({
-        queryKey: ["connections"]
-      })
+        queryKey: ["connections"],
+      });
     },
     onError: (error: any) => {
-      console.error('Create error:', error)
-      alert(error.response?.data?.detail || error.message || 'Failed to create connection')
-    }
-  })
+      console.error("Create error:", error);
+      alert(
+        error.response?.data?.detail ||
+          error.message ||
+          "Failed to create connection"
+      );
+    },
+  });
 
   const { mutate: updateMutate, isPending: isUpdatePending } = useMutation({
     mutationFn: updateConnection,
     onSuccess: () => {
-      setIsOpen(false)
-      setForm(INITIAL_FORM)
+      setIsOpen(false);
+      setForm(INITIAL_FORM);
       queryClient.invalidateQueries({
-        queryKey: ["connections"]
-      })
+        queryKey: ["connections"],
+      });
     },
     onError: (error: any) => {
-      console.error('Update error:', error)
-      alert(error.response?.data?.detail || error.message || 'Failed to update connection')
-    }
-  })
+      console.error("Update error:", error);
+      alert(
+        error.response?.data?.detail ||
+          error.message ||
+          "Failed to update connection"
+      );
+    },
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSave = () => {
     if (isEditing) {
@@ -100,46 +124,60 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
         id: editingConnection?.id ?? "",
         ...(form.password.trim() !== "" ? { password: form.password } : {}),
         ...(form.name !== editingConnection.name ? { name: form.name } : {}),
-        ...(form.protocol !== editingConnection.protocol ? { protocol: form.protocol } : {}),
-        ...(form.hostname !== editingConnection.hostname ? { hostname: form.hostname } : {}),
+        ...(form.protocol !== editingConnection.protocol
+          ? { protocol: form.protocol }
+          : {}),
+        ...(form.hostname !== editingConnection.hostname
+          ? { hostname: form.hostname }
+          : {}),
         ...(form.port !== editingConnection.port ? { port: form.port } : {}),
-        ...(form.username !== editingConnection.username ? { username: form.username } : {}),
-        ...(form.organization_id !== editingConnection.organization_id ? { organization_id: form.organization_id } : {}),
-        ...(form.description !== editingConnection.description ? { description: form.description } : {}),
-        ...(form.status !== editingConnection.status ? { status: form.status } : {}),
-      })
-      return
+        ...(form.username !== editingConnection.username
+          ? { username: form.username }
+          : {}),
+        ...(form.organization_id !== editingConnection.organization_id
+          ? { organization_id: form.organization_id }
+          : {}),
+        ...(form.description !== editingConnection.description
+          ? { description: form.description }
+          : {}),
+        ...(form.status !== editingConnection.status
+          ? { status: form.status }
+          : {}),
+      });
+      return;
     }
-    mutate(form)
-  }
+    mutate(form);
+  };
 
   // Management the state the disabled
   useEffect(() => {
     Object.values(form).forEach((value) => {
       if (value.toString().trim() === "") {
-        setDisabled(true)
-        return
+        setDisabled(true);
+        return;
       }
-    })
-    setDisabled(false)
-  }, [form])
+    });
+    setDisabled(false);
+  }, [form]);
 
   // Management the state the loading
   useEffect(() => {
     if (isPending !== isLoading || isUpdatePending !== isLoading) {
-      setIsLoading(isPending || isUpdatePending)
+      setIsLoading(isPending || isUpdatePending);
     }
-  }, [isPending, isUpdatePending])
+  }, [isPending, isUpdatePending]);
 
   // Management the state the editing connection
   useEffect(() => {
     if (!isEditing) {
-      setForm(INITIAL_FORM)
+      setForm(INITIAL_FORM);
       // fill create_by_user_id when creating new connection
-      getCurrentUser().then((user) => {
-        setForm((prev) => ({ ...prev, create_by_user_id: user.id }))
-      }).catch(console.error)
-      return
+      getCurrentUser()
+        .then((user) => {
+          setForm((prev) => ({ ...prev, create_by_user_id: user.id }));
+        })
+        .catch(console.error);
+      return;
     }
     setForm({
       organization_id: editingConnection?.organization_id ?? "",
@@ -153,14 +191,16 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
       description: editingConnection?.description ?? "",
       status: editingConnection?.status ?? "active",
       total_sessions: editingConnection?.total_sessions ?? 0,
-    })
-  }, [editingConnection, isEditing])
+    });
+  }, [editingConnection, isEditing]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">{isEditing ? "Edit" : "Create"} Connection</DialogTitle>
+          <DialogTitle className="text-white">
+            {isEditing ? "Edit" : "Create"} Connection
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -178,7 +218,9 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
             <SelectSearch
               items={PROTOCOL_OPTIONS}
               value={form.protocol}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, protocol: value }))}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, protocol: value }))
+              }
             />
           </div>
           <div className="space-y-2">
@@ -198,8 +240,11 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
               type="text"
               value={form.port.toString()}
               onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, '')
-                setForm((prev) => ({ ...prev, port: value ? parseInt(value) : 0 }))
+                const value = e.target.value.replace(/\D/g, "");
+                setForm((prev) => ({
+                  ...prev,
+                  port: value ? parseInt(value) : 0,
+                }));
               }}
               placeholder="22"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
@@ -229,8 +274,15 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Organization</Label>
             <SelectSearch
-              items={organizations?.map((organization) => ({ label: organization.name, value: organization.id })) ?? []}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, organization_id: value }))}
+              items={
+                organizations?.map((organization) => ({
+                  label: organization.name,
+                  value: organization.id,
+                })) ?? []
+              }
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, organization_id: value }))
+              }
               value={form.organization_id}
             />
           </div>
@@ -239,7 +291,9 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
             <SelectSearch
               items={STATUS_OPTIONS}
               value={form.status}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, status: value }))
+              }
             />
           </div>
           <div className="space-y-2">
@@ -254,7 +308,11 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
           </div>
         </div>
         <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => setIsOpen(false)} className="text-white hover:bg-[#11111f]">
+          <Button
+            variant="ghost"
+            onClick={() => setIsOpen(false)}
+            className="text-white hover:bg-[#11111f]"
+          >
             Cancel
           </Button>
           <Button
@@ -267,5 +325,5 @@ export default function CreateEditConnectionModal({ isOpen, setIsOpen, organizat
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

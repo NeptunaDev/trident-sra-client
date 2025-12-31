@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api } from "../axios";
 
 export type PermissionUser = "create" | "read" | "update" | "delete";
 export type PermissionSessions = "create" | "read";

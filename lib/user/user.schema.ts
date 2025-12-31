@@ -26,12 +26,12 @@ export const getCreateUserSchema = () => {
       .min(1, messages.nameRequired)
       .min(3, messages.nameMin)
       .max(100, messages.nameMax),
-    
+
     email: z
       .string()
       .min(1, messages.emailRequired)
       .email(messages.emailInvalid),
-    
+
     password: z
       .string()
       .min(1, messages.passwordRequired)
@@ -39,14 +39,10 @@ export const getCreateUserSchema = () => {
       .regex(/[A-Z]/, messages.passwordUppercase)
       .regex(/[a-z]/, messages.passwordLowercase)
       .regex(/[0-9]/, messages.passwordNumber),
-    
-    role_id: z
-      .string()
-      .min(1, messages.roleRequired),
-    
-    organization_id: z
-      .string()
-      .min(1, messages.organizationRequired),
+
+    role_id: z.string().min(1, messages.roleRequired),
+
+    organization_id: z.string().min(1, messages.organizationRequired),
   });
 };
 
@@ -59,12 +55,12 @@ export const getUpdateUserSchema = () => {
       .min(1, messages.nameRequired)
       .min(3, messages.nameMin)
       .max(100, messages.nameMax),
-    
+
     email: z
       .string()
       .min(1, messages.emailRequired)
       .email(messages.emailInvalid),
-    
+
     password: z
       .string()
       .min(8, messages.passwordMin)
@@ -73,14 +69,10 @@ export const getUpdateUserSchema = () => {
       .regex(/[0-9]/, messages.passwordNumber)
       .optional()
       .or(z.literal("")), // Allows empty string
-    
-    role_id: z
-      .string()
-      .min(1, messages.roleRequired),
-    
-    organization_id: z
-      .string()
-      .min(1, messages.organizationRequired),
+
+    role_id: z.string().min(1, messages.roleRequired),
+
+    organization_id: z.string().min(1, messages.organizationRequired),
   });
 };
 
@@ -89,5 +81,9 @@ export const createUserSchema = getCreateUserSchema();
 export const updateUserSchema = getUpdateUserSchema();
 
 // Infer types from schemas
-export type CreateUserFormData = z.infer<ReturnType<typeof getCreateUserSchema>>;
-export type UpdateUserFormData = z.infer<ReturnType<typeof getUpdateUserSchema>>;
+export type CreateUserFormData = z.infer<
+  ReturnType<typeof getCreateUserSchema>
+>;
+export type UpdateUserFormData = z.infer<
+  ReturnType<typeof getUpdateUserSchema>
+>;
