@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { deleteAuditLogs, getAuditLogs, AuditLogs } from "@/lib/auditLogs";
+import {
+  deleteAuditLogs,
+  getAuditLogs,
+  AuditLogs,
+} from "@/lib/auditLogs/auditLogs";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

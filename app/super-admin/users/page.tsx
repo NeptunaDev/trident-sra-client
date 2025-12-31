@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 
-import { getRoles, Role } from "@/lib/role";
+import { getRoles, Role } from "@/lib/role/role";
 import {
   getOrganizations,
   Organization,

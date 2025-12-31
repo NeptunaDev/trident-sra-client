@@ -113,6 +113,25 @@ export const translations = {
       "Max connections must be a positive integer or null",
     validation_max_agents_invalid:
       "Max agents must be a positive integer or null",
+    validation_role_name_min: "Role name must be at least 1 character",
+    validation_role_name_max: "Role name must be at most 50 characters",
+    validation_role_display_name_min:
+      "Display name must be at least 1 character",
+    validation_role_display_name_max:
+      "Display name must be at most 100 characters",
+    validation_role_color_required: "Color is required",
+    validation_role_color_invalid:
+      "Color must be a valid hex color (e.g., #5bc2e7)",
+    validation_role_permissions_required: "Permissions are required",
+    validation_event_type_required: "Event type is required",
+    validation_event_type_min: "Event type must be at least 10 characters",
+    validation_event_type_max: "Event type must be at most 100 characters",
+    validation_action_required: "Action is required",
+    validation_action_min: "Action must be at least 5 characters",
+    validation_action_max: "Action must be at most 255 characters",
+    validation_status_required: "Status is required",
+    validation_status_min: "Status must be at least 5 characters",
+    validation_status_max: "Status must be at most 50 characters",
   },
   es: {
     // Navigation
@@ -227,6 +246,29 @@ export const translations = {
       "El máximo de conexiones debe ser un entero positivo o null",
     validation_max_agents_invalid:
       "El máximo de agentes debe ser un entero positivo o null",
+    validation_role_name_min:
+      "El nombre del rol debe tener al menos 1 carácter",
+    validation_role_name_max:
+      "El nombre del rol debe tener como máximo 50 caracteres",
+    validation_role_display_name_min:
+      "El nombre de visualización debe tener al menos 1 carácter",
+    validation_role_display_name_max:
+      "El nombre de visualización debe tener como máximo 100 caracteres",
+    validation_role_color_required: "El color es requerido",
+    validation_role_color_invalid:
+      "El color debe ser un color hexadecimal válido (ej: #5bc2e7)",
+    validation_role_permissions_required: "Los permisos son requeridos",
+    validation_event_type_required: "El tipo de evento es requerido",
+    validation_event_type_min:
+      "El tipo de evento debe tener al menos 10 caracteres",
+    validation_event_type_max:
+      "El tipo de evento debe tener como máximo 100 caracteres",
+    validation_action_required: "La acción es requerida",
+    validation_action_min: "La acción debe tener al menos 5 caracteres",
+    validation_action_max: "La acción debe tener como máximo 255 caracteres",
+    validation_status_required: "El estado es requerido",
+    validation_status_min: "El estado debe tener al menos 5 caracteres",
+    validation_status_max: "El estado debe tener como máximo 50 caracteres",
   },
 };
 

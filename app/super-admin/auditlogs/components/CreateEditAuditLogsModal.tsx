@@ -1,13 +1,22 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
-  CreateAuditLogs,
   createAuditLogs,
   updateAuditLogs,
-  UpdateAuditLogs,
   AuditLogs,
-} from "@/lib/auditLogs";
+} from "@/lib/auditLogs/auditLogs";
+
+import {
+  CreateAuditLogFormData,
+  getCreateAuditLogSchema,
+  getUpdateAuditLogSchema,
+  UpdateAuditLogFormData,
+} from "@/lib/auditLogs/auditLogs.schema";
+
 import { getUser, User } from "@/lib/user/user";
 import {
   getOrganizations,
@@ -26,6 +35,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectSearch } from "@/components/ui/select-search";
+import { FormError } from "@/components/ui/form-error";
 
 interface CreateEditAuditLogsModalProps {
   isOpen: boolean;
@@ -33,34 +43,15 @@ interface CreateEditAuditLogsModalProps {
   editingAuditLog: AuditLogs | null;
 }
 
-type FormData = {
-  event_type: string;
-  action: string;
-  description: string;
-  status: string;
-  user_id: string;
-  organization_id: string;
-};
-
-const INITIAL_FORM: FormData = {
-  event_type: "",
-  action: "",
-  description: "",
-  status: "",
-  user_id: "",
-  organization_id: "",
-};
-
 export default function CreateEditAuditLogsModal({
   isOpen,
   setIsOpen,
   editingAuditLog,
 }: CreateEditAuditLogsModalProps) {
   const isEditing = !!editingAuditLog;
-  const [disabled, setDisabled] = useState(false);
-  const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const { isLoading, setIsLoading } = useloadingStore();
   const queryClient = useQueryClient();
+
   const { data: users } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: getUser,
@@ -71,11 +62,39 @@ export default function CreateEditAuditLogsModal({
     queryFn: getOrganizations,
   });
 
+  // Use the correct schema based on whether we're editing or creating
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+    setValue,
+    watch,
+  } = useForm<CreateAuditLogFormData | UpdateAuditLogFormData>({
+    resolver: zodResolver(
+      isEditing ? getUpdateAuditLogSchema() : getCreateAuditLogSchema()
+    ),
+    mode: "onBlur", // Validates when field loses focus
+    defaultValues: {
+      event_type: "",
+      action: "",
+      description: "",
+      status: "",
+      user_id: "",
+      organization_id: "",
+      details: null,
+    },
+  });
+
+  // Watch select values
+  const userId = watch("user_id");
+  const organizationId = watch("organization_id");
+
   const { mutate, isPending } = useMutation({
     mutationFn: createAuditLogs,
     onSuccess: () => {
-      setForm(INITIAL_FORM);
       setIsOpen(false);
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["audit-logs"],
       });
@@ -85,79 +104,74 @@ export default function CreateEditAuditLogsModal({
   const { mutate: updateMutate, isPending: isUpdatePending } = useMutation({
     mutationFn: updateAuditLogs,
     onSuccess: () => {
-      setForm(INITIAL_FORM);
       setIsOpen(false);
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["audit-logs"],
       });
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSave = () => {
-    if (isEditing) {
-      const updateData: UpdateAuditLogs = {
-        id: editingAuditLog?.id ?? "",
-        event_type: form.event_type || editingAuditLog?.event_type || "",
-        action: form.action || editingAuditLog?.action || "",
-        description: form.description || editingAuditLog?.description || "",
-        status: form.status || editingAuditLog?.status || "",
-        organization_id:
-          form.organization_id || editingAuditLog?.organization_id || "",
-        user_id: form.user_id || editingAuditLog?.user_id || "",
+  const onSubmit = (data: CreateAuditLogFormData | UpdateAuditLogFormData) => {
+    if (!isEditing) {
+      const createData = {
+        event_type: data.event_type as string,
+        action: data.action as string,
+        description: data.description || null,
+        status: data.status as string,
+        details: data.details || null,
+        organization_id: data.organization_id || null,
+        user_id: data.user_id || null,
       };
-      console.log("Updating audit log with data:", updateData);
-      updateMutate(updateData);
+      mutate(createData);
       return;
     }
 
-    const createData: CreateAuditLogs = {
-      event_type: form.event_type.trim(),
-      action: form.action.trim(),
-      description: form.description.trim(),
-      status: form.status.trim(),
-      details: {},
-      organization_id: form.organization_id.trim(),
-      user_id: form.user_id.trim(),
+    const updateData: {
+      id: string;
+      event_type?: string;
+      action?: string;
+      description?: string | null;
+      status?: string;
+      details?: Record<string, any> | null;
+      organization_id?: string | null;
+      user_id?: string | null;
+    } = {
+      id: editingAuditLog?.id ?? "",
     };
-    console.log(
-      "Creating audit log with data:",
-      JSON.stringify(createData, null, 2)
-    );
-    mutate(createData);
+
+    if (data.event_type && data.event_type !== editingAuditLog?.event_type) {
+      updateData.event_type = data.event_type as string;
+    }
+    if (data.action && data.action !== editingAuditLog?.action) {
+      updateData.action = data.action as string;
+    }
+    if (
+      data.description !== undefined &&
+      data.description !== editingAuditLog?.description
+    ) {
+      updateData.description = data.description || null;
+    }
+    if (data.status && data.status !== editingAuditLog?.status) {
+      updateData.status = data.status as string;
+    }
+    if (
+      data.organization_id !== undefined &&
+      data.organization_id !== editingAuditLog?.organization_id
+    ) {
+      updateData.organization_id = data.organization_id || null;
+    }
+    if (
+      data.user_id !== undefined &&
+      data.user_id !== editingAuditLog?.user_id
+    ) {
+      updateData.user_id = data.user_id || null;
+    }
+
+    updateMutate(updateData);
   };
 
-  useEffect(() => {
-    if (isEditing) {
-      const hasChanges =
-        form.event_type !== editingAuditLog?.event_type ||
-        form.action !== editingAuditLog?.action ||
-        form.description !== editingAuditLog?.description ||
-        form.status !== editingAuditLog?.status ||
-        form.organization_id !== editingAuditLog?.organization_id ||
-        form.user_id !== editingAuditLog?.user_id;
-      setDisabled(!hasChanges);
-    } else {
-      // In create mode, all fields are required
-      const hasEmptyString =
-        form.event_type.trim() === "" ||
-        form.action.trim() === "" ||
-        form.description.trim() === "" ||
-        form.status.trim() === "" ||
-        form.organization_id.trim() === "" ||
-        form.user_id.trim() === "";
-      setDisabled(hasEmptyString);
-    }
-  }, [form, isEditing, editingAuditLog]);
-
-  // Management the state the loading
+  // Manage loading state
   useEffect(() => {
     setIsLoading(isPending || isUpdatePending);
   }, [isPending, isUpdatePending, setIsLoading]);
@@ -165,23 +179,40 @@ export default function CreateEditAuditLogsModal({
   // Reset form when modal opens/closes or editing changes
   useEffect(() => {
     if (!isOpen) {
-      setForm(INITIAL_FORM);
+      reset({
+        event_type: "",
+        action: "",
+        description: "",
+        status: "",
+        user_id: "",
+        organization_id: "",
+        details: null,
+      });
       return;
     }
 
     if (isEditing && editingAuditLog) {
-      setForm({
+      reset({
         event_type: editingAuditLog.event_type ?? "",
         action: editingAuditLog.action ?? "",
         description: editingAuditLog.description ?? "",
         status: editingAuditLog.status ?? "",
         organization_id: editingAuditLog.organization_id ?? "",
         user_id: editingAuditLog.user_id ?? "",
+        details: editingAuditLog.details ?? null,
       });
     } else {
-      setForm(INITIAL_FORM);
+      reset({
+        event_type: "",
+        action: "",
+        description: "",
+        status: "",
+        user_id: "",
+        organization_id: "",
+        details: null,
+      });
     }
-  }, [isOpen, editingAuditLog, isEditing]);
+  }, [isOpen, editingAuditLog, isEditing, reset]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -196,46 +227,46 @@ export default function CreateEditAuditLogsModal({
               : "Fill in the information to create a new audit log."}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Event Type</Label>
             <Input
-              name="event_type"
-              value={form.event_type}
-              onChange={handleChange}
+              {...register("event_type")}
+              error={!!errors.event_type}
               placeholder="user.login"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.event_type?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Action</Label>
             <Input
-              name="action"
-              value={form.action}
-              onChange={handleChange}
+              {...register("action")}
+              error={!!errors.action}
               placeholder="login"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.action?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Description</Label>
             <Input
-              name="description"
-              value={form.description}
-              onChange={handleChange}
+              {...register("description")}
+              error={!!errors.description}
               placeholder="User logged in successfully"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.description?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Status</Label>
             <Input
-              name="status"
-              value={form.status}
-              onChange={handleChange}
+              {...register("status")}
+              error={!!errors.status}
               placeholder="success"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
             />
+            <FormError message={errors.status?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">User</Label>
@@ -247,10 +278,12 @@ export default function CreateEditAuditLogsModal({
                 })) ?? []
               }
               onValueChange={(value) =>
-                setForm((prev) => ({ ...prev, user_id: value }))
+                setValue("user_id", value || null, { shouldValidate: true })
               }
-              value={form.user_id}
+              value={userId || ""}
+              error={!!errors.user_id}
             />
+            <FormError message={errors.user_id?.message} />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Organization</Label>
@@ -262,28 +295,33 @@ export default function CreateEditAuditLogsModal({
                 })) ?? []
               }
               onValueChange={(value) =>
-                setForm((prev) => ({ ...prev, organization_id: value }))
+                setValue("organization_id", value || null, {
+                  shouldValidate: true,
+                })
               }
-              value={form.organization_id}
+              value={organizationId || ""}
+              error={!!errors.organization_id}
             />
+            <FormError message={errors.organization_id?.message} />
           </div>
-        </div>
-        <DialogFooter className="gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => setIsOpen(false)}
-            className="text-white hover:bg-[#11111f]"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={disabled}
-            className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
-          >
-            {isEditing ? "Update" : "Create"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsOpen(false)}
+              className="text-white hover:bg-[#11111f]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending || isUpdatePending || !isValid}
+              className="bg-gradient-to-r from-[#5bc2e7] to-[#4ba8d1] hover:from-[#4ba8d1] hover:to-[#5bc2e7] text-[#11111f] font-semibold disabled:opacity-50"
+            >
+              {isEditing ? "Update" : "Create"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

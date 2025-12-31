@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUser, CreateUser, updateUser, User } from "@/lib/user/user";
-import { Role } from "@/lib/role";
+import { Role } from "@/lib/role/role";
 import { Organization } from "@/lib/organization/organization";
 import { useloadingStore } from "@/store/loadingStore";
 import { Button } from "@/components/ui/button";
