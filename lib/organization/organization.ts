@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api } from "../axios";
 
 export interface Organization {
   id: string;
@@ -17,9 +17,9 @@ export interface CreateOrganization {
   name: string;
   slug: string;
   plan: string;
-  max_users: number;
-  max_connections: number;
-  max_agents: number;
+  max_users: number | null;
+  max_connections: number | null;
+  max_agents: number | null;
 }
 
 export interface updateOrganization extends Partial<CreateOrganization> {
