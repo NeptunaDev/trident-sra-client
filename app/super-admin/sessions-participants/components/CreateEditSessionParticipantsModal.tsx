@@ -9,7 +9,7 @@ import {
   UpdateSessionParticipant,
   SessionParticipant,
   SessionParticipantRole,
-} from "@/lib/sessionParticipants";
+} from "@/lib/sessionParticipants/sessionParticipants";
 import { getUser, User } from "@/lib/user/user";
 import { getSession, Session } from "@/lib/Session/session";
 import { useloadingStore } from "@/store/loadingStore";

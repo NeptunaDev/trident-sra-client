@@ -1,78 +1,80 @@
-"use client" 
+"use client";
 
-import { useEffect, useState } from "react"
-import { useMutation,useQuery, useQueryClient } from "@tanstack/react-query"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 
-import { getOrganizations } from "@/lib/organization"
-import { Policy, getPolicies, deletePolicy } from "@/lib/Policy/policy"
-import { getUser } from "@/lib/user/user"
-import { formatDate } from "@/lib/utils"
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { AlertDialog } from "@/components/ui/alert-dialog"
-import CreateEditRecording from "./components/CreateEditPolicyModal"
-import { useloadingStore } from "@/store/loadingStore"
+import { getOrganizations } from "@/lib/organization/organization";
+import { Policy, getPolicies, deletePolicy } from "@/lib/Policy/policy";
+import { getUser } from "@/lib/user/user";
+import { formatDate } from "@/lib/utils";
+
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { AlertDialog } from "@/components/ui/alert-dialog";
+import CreateEditPolicyModal from "./components/CreateEditPolicyModal";
+import { useloadingStore } from "@/store/loadingStore";
+
 
 export default function PoliciesCrudPage() {
-    const [isOpen, setIsOpen] = useState(false)
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-    const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null)
-    const [deletingPolicy, setDeletingPolicy] = useState<Policy | null>(null)
-    const queryClient = useQueryClient()
-    const { isLoading, setIsLoading } = useloadingStore()
+  const [isOpen, setIsOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
+  const [deletingPolicy, setDeletingPolicy] = useState<Policy | null>(null);
+  const queryClient = useQueryClient();
+  const { isLoading, setIsLoading } = useloadingStore();
 
-    const { data: policies } = useQuery({
+  const { data: policies } = useQuery({
+    queryKey: ["policies"],
+    queryFn: getPolicies,
+  });
+
+  const { data: organizations } = useQuery({
+    queryKey: ["organizations"],
+    queryFn: getOrganizations,
+  });
+
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUser,
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: deletePolicy,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ["policies"],
-        queryFn: getPolicies
-    })
-
-    const { data: organizations } = useQuery({
-        queryKey: ["organizations"],
-        queryFn: getOrganizations
-    })
-
-    const { data: users } = useQuery({
-        queryKey: ["users"],
-        queryFn: getUser
-    })
-
-    const { mutate, isPending } = useMutation({
-        mutationFn: deletePolicy,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["policies"]
-            })
-            setShowDeleteDialog(false)
-            setDeletingPolicy(null)
-        },
-        onError: (error: any) => {
-            const message = error.message || 'Failed to delete policy'
-            alert(message)
-            setShowDeleteDialog(false)
-        }
-    })
-    const handleOpenDialog = () => {
-        setEditingPolicy(null)
-        setIsOpen(true)
+      });
+      setShowDeleteDialog(false);
+      setDeletingPolicy(null);
+    },
+    onError: (error: any) => {
+      const message = error.message || "Failed to delete policy";
+      alert(message);
+      setShowDeleteDialog(false);
+    },
+  });
+  const handleOpenDialog = () => {
+    setEditingPolicy(null);
+    setIsOpen(true);
+  };
+  const confirmDelete = () => {
+    mutate(deletingPolicy?.id ?? "");
+  };
+  const handleEdit = (it: Policy) => {
+    setEditingPolicy(it);
+    setIsOpen(true);
+  };
+  const handleDelete = (it: Policy) => {
+    setDeletingPolicy(it);
+    setShowDeleteDialog(true);
+  };
+  useEffect(() => {
+    if (isPending !== isLoading) {
+      setIsLoading(isPending);
     }
-    const confirmDelete = () => {
-        mutate(deletingPolicy?.id ?? "")
-    }
-    const handleEdit = (it: Policy) => {
-        setEditingPolicy(it)
-        setIsOpen(true)
-    }
-    const handleDelete = (it: Policy) => {
-        setDeletingPolicy(it)
-        setShowDeleteDialog(true)
-    }
-    useEffect(() => {
-      if (isPending !== isLoading) {
-          setIsLoading(isPending)
-      }
-    }, [isPending, isLoading, setIsLoading])
+  }, [isPending, isLoading, setIsLoading]);
 
     return (
         <div className="space-y-4">
@@ -162,7 +164,7 @@ export default function PoliciesCrudPage() {
                 </div>
             </Card>
 
-            <CreateEditRecording
+            <CreateEditPolicyModal
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 organizations={organizations ?? []}
@@ -180,5 +182,6 @@ export default function PoliciesCrudPage() {
                 onConfirm={confirmDelete}
             />
         </div>
-    )
+       
+  );
 }

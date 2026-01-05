@@ -4,11 +4,11 @@ import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod" 
 import { FormError } from "@/components/ui/form-error"
-import { CreatePolicyFormData, UpdatePolicyFormData, getCreatePolicySchema, getUpdatePolicySchema } from "@/lib/Policy/policy.schema"
+import { CreatePolicyFormData, getCreatePolicySchema, getUpdatePolicySchema } from "@/lib/Policy/policy.schema"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { createPolicy, updatePolicy, Policy } from "@/lib/Policy/policy"
-import { Organization } from "@/lib/organization"
+import { Organization } from "@/lib/organization/organization"
 import { getCurrentUser } from "@/lib/user/user"
 
 import { useloadingStore } from "@/store/loadingStore"

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { deleteRole, getRoles, Role } from "@/lib/role";
+import { deleteRole, getRoles, Role } from "@/lib/role/role";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -131,12 +131,12 @@ export default function RolesCrudPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex flex-col gap-2">
-                        {it.permissions.sessions.length > 0 && (
+                        {it.permissions?.sessions?.length > 0 && (
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-xs font-medium text-[#c0c5ce]">
                               Sessions:
                             </span>
-                            {it.permissions.sessions.map((perm, idx) => (
+                            {it.permissions?.sessions?.map((perm, idx) => (
                               <Badge
                                 key={`sessions-${idx}`}
                                 variant="outline"
@@ -147,12 +147,12 @@ export default function RolesCrudPage() {
                             ))}
                           </div>
                         )}
-                        {it.permissions.users.length > 0 && (
+                        {it.permissions?.users?.length > 0 && (
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-xs font-medium text-[#c0c5ce]">
                               Users:
                             </span>
-                            {it.permissions.users.map((perm, idx) => (
+                            {it.permissions?.users?.map((perm, idx) => (
                               <Badge
                                 key={`users-${idx}`}
                                 variant="outline"
@@ -163,8 +163,8 @@ export default function RolesCrudPage() {
                             ))}
                           </div>
                         )}
-                        {it.permissions.sessions.length === 0 &&
-                          it.permissions.users.length === 0 && (
+                        {it.permissions?.sessions?.length === 0 &&
+                          it.permissions?.users?.length === 0 && (
                             <span className="text-xs text-[#6b7280]">
                               No permissions
                             </span>
@@ -175,7 +175,7 @@ export default function RolesCrudPage() {
                       <div className="flex gap-2">
                         <div
                           className="w-4 h-4 rounded-full border border-[rgba(91,194,231,0.3)]"
-                          style={{ backgroundColor: it.color }}
+                          style={{ backgroundColor: it.color || "#ffffff" }}
                         />
                       </div>
                     </td>
@@ -183,10 +183,10 @@ export default function RolesCrudPage() {
                       {it.is_system ? "Yes" : "No"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.created_at)}
+                      {it.created_at ? formatDate(it.created_at) : "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.updated_at)}
+                      {it.updated_at ? formatDate(it.updated_at) : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">

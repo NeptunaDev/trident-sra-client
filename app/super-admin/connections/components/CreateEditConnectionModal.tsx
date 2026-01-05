@@ -1,29 +1,36 @@
-"use client"
+"use client";
 
 import { useEffect } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { createConnection, updateConnection, CreateConnection, Connection } from "@/lib/Connection/connections"
-import { Organization } from "@/lib/organization"
+import { createConnection, updateConnection, Connection } from "@/lib/Connection/connections"
+import { Organization } from "@/lib/organization/organization";
 import { getCurrentUser } from "@/lib/user/user"
 import { CreateConnectionFormData, UpdateConnectionFormData, getCreateConnectionSchema, getUpdateConnectionSchema } from "@/lib/Connection/connections.schema"
 
-import { useloadingStore } from "@/store/loadingStore"
+import { useloadingStore } from "@/store/loadingStore";
 
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { SelectSearch } from "@/components/ui/select-search"
-import { FormError } from "@/components/ui/form-error"
+import { FormError } from "@/components/ui/form-error";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SelectSearch } from "@/components/ui/select-search";
 
 interface CreateEditConnectionModalProps {
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  organizations: Organization[]
-  editingConnection: Connection | null
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  organizations: Organization[];
+  editingConnection: Connection | null;
 }
 
 const PROTOCOL_OPTIONS = [
@@ -31,12 +38,12 @@ const PROTOCOL_OPTIONS = [
   { label: "RDP", value: "rdp" },
   { label: "VNC", value: "vnc" },
   { label: "Telnet", value: "telnet" },
-]
+];
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
-]
+];
 
 export default function CreateEditConnectionModal({ 
   isOpen, 
@@ -93,8 +100,8 @@ export default function CreateEditConnectionModal({
       setIsOpen(false)
       reset()
       queryClient.invalidateQueries({
-        queryKey: ["connections"]
-      })
+        queryKey: ["connections"],
+      });
     },
   })
   const { mutate: updateMutate, isPending: isUpdatePending } = useMutation({
@@ -103,8 +110,8 @@ export default function CreateEditConnectionModal({
       setIsOpen(false)
       reset()
       queryClient.invalidateQueries({
-        queryKey: ["connections"]
-      })
+        queryKey: ["connections"],
+      });
     },
   })
 
@@ -172,7 +179,9 @@ export default function CreateEditConnectionModal({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">{isEditing ? "Edit" : "Create"} Connection</DialogTitle>
+          <DialogTitle className="text-white">
+            {isEditing ? "Edit" : "Create"} Connection
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -287,5 +296,5 @@ export default function CreateEditConnectionModal({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

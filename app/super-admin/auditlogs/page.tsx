@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { deleteAuditLogs, getAuditLogs, AuditLogs } from "@/lib/auditLogs";
+import {
+  deleteAuditLogs,
+  getAuditLogs,
+  AuditLogs,
+} from "@/lib/auditLogs/auditLogs";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -131,7 +135,7 @@ export default function AuditLogsCrudPage() {
                     className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]"
                   >
                     <td className="py-3 px-4 text-white font-medium">
-                      {it.id.split("-")[0]}
+                      {it.id?.split("-")[0]}
                     </td>
                     <td className="py-3 px-4 text-white font-medium">
                       {it.event_type}
@@ -142,16 +146,16 @@ export default function AuditLogsCrudPage() {
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.status}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.user_id.split("-")[0]}
+                      {it.user_id?.split("-")[0] || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.organization_id.split("-")[0]}
+                      {it.organization_id?.split("-")[0] || "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.timestamp || it.timestamp)}
+                      {it.timestamp ? formatDate(it.timestamp) : "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {formatDate(it.created_at || it.created_at)}
+                      {it.created_at ? formatDate(it.created_at) : "-"}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
