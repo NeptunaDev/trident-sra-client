@@ -1,11 +1,12 @@
 import { api } from "../axios";
 
+export type Status = "Success" | "Failure";
 export interface AuditLogs {
   id: string;
   event_type: string;
   action: string;
   description: string | null;
-  status: string | null;
+  status: Status | null;
   details: Record<string, any> | null;
   user_id: string;
   organization_id: string;
@@ -17,7 +18,7 @@ export interface CreateAuditLogs {
   event_type: string;
   action: string;
   description: string | null;
-  status: string | null;
+  status: Status | null;
   details: Record<string, any> | null;
   organization_id: string | null;
   user_id: string | null;

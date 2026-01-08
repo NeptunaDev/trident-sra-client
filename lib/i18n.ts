@@ -138,6 +138,7 @@ export const translations = {
     validation_session_id_invalid: "Session ID must be a valid UUID",
     validation_file_size_min: "File size cannot be negative",
     validation_duration_min: "Duration cannot be negative",
+    validation_user_id_required: "User authentication is required",
   },
   es: {
     // Navigation
@@ -281,6 +282,8 @@ export const translations = {
     validation_session_id_invalid: "El ID de sesión no es un UUID válido",
     validation_file_size_min: "El tamaño no puede ser negativo",
     validation_duration_min: "La duración no puede ser negativa",
+    validation_user_id_required:
+      "Se requiere identificación de usuario de validación",
   },
 };
 

@@ -33,7 +33,9 @@ export const getCreateOrganizationSchema = () => {
       .regex(/^[a-z0-9-]+$/, messages.slugInvalid)
       .trim(),
 
-    plan: z.string().min(1, messages.planRequired).trim(),
+    plan: z.enum(["Free", "Pro", "Enterprise"], {
+      errorMap: () => ({ message: messages.planRequired }),
+    }),
 
     max_users: z.preprocess((val) => {
       if (val === "" || val === null || val === undefined) return null;

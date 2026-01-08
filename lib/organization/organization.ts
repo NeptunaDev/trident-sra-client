@@ -1,10 +1,11 @@
 import { api } from "../axios";
 
+export type PlanType = "Free" | "Pro" | "Enterprise";
 export interface Organization {
   id: string;
   name: string;
   is_active: boolean;
-  plan: string;
+  plan: PlanType;
   slug: string;
   max_users: number;
   max_agents: number;

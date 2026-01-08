@@ -1,70 +1,40 @@
 import { z } from "zod";
 import { t } from "@/lib/i18n";
 
-// Mensajes de validación centralizados
 const getValidationMessages = () => ({
-  fileUrlRequired: t("validation_file_url_required"),
-  fileUrlInvalid: t("validation_file_url_invalid"),
   sessionIdRequired: t("validation_session_id_required"),
-  sessionIdInvalid: t("validation_session_id_invalid"),
-  fileSizeBytesMin: t("validation_file_size_min"),
-  durationMin: t("validation_duration_min"),
+  userIdRequired: t("validation_user_id_required"),
+  roleRequired: t("validation_role_required"),
 });
 
-// Esquema base para los campos comunes
-const sessionRecordingBase = (
+const sessionParticipantsBase = (
   messages: ReturnType<typeof getValidationMessages>
 ) => ({
-  file_url: z
-    .string()
-    .url(messages.fileUrlInvalid)
-    .min(1, messages.fileUrlRequired),
-  file_name: z.string().nullable().optional(),
-  file_size_bytes: z
-    .number()
-    .int()
-    .min(0, messages.fileSizeBytesMin)
-    .nullable()
-    .optional(),
-  duration_seconds: z
-    .number()
-    .int()
-    .min(0, messages.durationMin)
-    .nullable()
-    .optional(),
-  status: z.string().nullable().optional(),
-  session_id: z.string().uuid(messages.sessionIdInvalid),
+  session_id: z.string().uuid(messages.sessionIdRequired).min(1),
+  user_id: z.string().uuid(messages.userIdRequired).min(1),
+  role: z.enum(["Owner", "Collaborator", "Observer"]),
+  can_write: z.boolean().default(false),
+  join_at: z.string().nullable().optional(),
 });
 
-// Factory para creación (Todos los campos requeridos según tu especificación)
-export const getCreateSessionRecordingSchema = () => {
+export const getCreateSessionParticipantsSchema = () => {
   const messages = getValidationMessages();
-  return z.object(sessionRecordingBase(messages));
+  return z.object(sessionParticipantsBase(messages));
 };
 
-// Factory para actualización (Campos opcionales)
-export const getUpdateSessionRecordingSchema = () => {
+export const getUpdateSessionParticipantsSchema = () => {
   const messages = getValidationMessages();
-  const base = sessionRecordingBase(messages);
-
+  const base = sessionParticipantsBase(messages);
   return z.object({
-    file_url: base.file_url.optional(),
-    file_name: base.file_name,
-    file_size_bytes: base.file_size_bytes,
-    duration_seconds: base.duration_seconds,
-    status: base.status,
-    session_id: base.session_id.optional(),
+    role: base.role.optional(),
+    can_write: base.can_write.optional(),
+    is_active: z.boolean().optional(),
   });
 };
 
-// Exportación de esquemas estáticos
-export const createSessionRecordingSchema = getCreateSessionRecordingSchema();
-export const updateSessionRecordingSchema = getUpdateSessionRecordingSchema();
-
-// Inferencia de tipos
-export type CreateSessionRecordingData = z.infer<
-  ReturnType<typeof getCreateSessionRecordingSchema>
+export type CreateSessionParticipantsData = z.infer<
+  ReturnType<typeof getCreateSessionParticipantsSchema>
 >;
-export type UpdateSessionRecordingData = z.infer<
-  ReturnType<typeof getUpdateSessionRecordingSchema>
+export type UpdateSessionParticipantsData = z.infer<
+  ReturnType<typeof getUpdateSessionParticipantsSchema>
 >;

@@ -1,6 +1,6 @@
 import { api } from "../axios";
 
-export type SessionParticipantRole = "owner" | "collaborator" | "viewer";
+export type SessionParticipantRole = "Owner" | "Collaborator" | "Observer";
 
 export interface SessionParticipant {
   id: string;

@@ -1,13 +1,14 @@
 "use client";
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   createAuditLogs,
   updateAuditLogs,
   AuditLogs,
+  Status,
 } from "@/lib/auditLogs/auditLogs";
 
 import {
@@ -70,6 +71,7 @@ export default function CreateEditAuditLogsModal({
     reset,
     setValue,
     watch,
+    control,
   } = useForm<CreateAuditLogFormData | UpdateAuditLogFormData>({
     resolver: zodResolver(
       isEditing ? getUpdateAuditLogSchema() : getCreateAuditLogSchema()
@@ -118,7 +120,7 @@ export default function CreateEditAuditLogsModal({
         event_type: data.event_type as string,
         action: data.action as string,
         description: data.description || null,
-        status: data.status as string,
+        status: data.status as Status,
         details: data.details || null,
         organization_id: data.organization_id || null,
         user_id: data.user_id || null,
@@ -132,7 +134,7 @@ export default function CreateEditAuditLogsModal({
       event_type?: string;
       action?: string;
       description?: string | null;
-      status?: string;
+      status?: Status;
       details?: Record<string, any> | null;
       organization_id?: string | null;
       user_id?: string | null;
@@ -153,7 +155,7 @@ export default function CreateEditAuditLogsModal({
       updateData.description = data.description || null;
     }
     if (data.status && data.status !== editingAuditLog?.status) {
-      updateData.status = data.status as string;
+      updateData.status = data.status as Status;
     }
     if (
       data.organization_id !== undefined &&
@@ -214,6 +216,11 @@ export default function CreateEditAuditLogsModal({
     }
   }, [isOpen, editingAuditLog, isEditing, reset]);
 
+  const StatusOption = [
+    { value: "Success", label: "Success" },
+    { value: "Failure", label: "Failure" },
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] text-white max-w-2xl">
@@ -260,11 +267,24 @@ export default function CreateEditAuditLogsModal({
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Status</Label>
-            <Input
+            {/* <Input
               {...register("status")}
               error={!!errors.status}
               placeholder="success"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
+            /> */}
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <SelectSearch
+                  items={StatusOption}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  error={!!errors.status}
+                  placeholder="Select a plan"
+                />
+              )}
             />
             <FormError message={errors.status?.message} />
           </div>

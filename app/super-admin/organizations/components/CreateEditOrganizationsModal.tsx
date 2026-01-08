@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import {
   CreateOrganization,
   Organization,
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormError } from "@/components/ui/form-error";
 import {
@@ -28,6 +27,7 @@ import {
   getUpdateOrganizationSchema,
   UpdateOrganizationFormData,
 } from "@/lib/organization/organization.schema";
+import { SelectSearch } from "@/components/ui/select-search";
 
 interface CreateEditOrganizationsModalProps {
   isOpen: boolean;
@@ -52,6 +52,7 @@ export default function CreateEditOrganizationsModal({
     setValue,
     watch,
     trigger,
+    control,
   } = useForm<CreateOrganizationFormData | UpdateOrganizationFormData>({
     resolver: zodResolver(
       isEditing ? getUpdateOrganizationSchema() : getCreateOrganizationSchema()
@@ -193,6 +194,12 @@ export default function CreateEditOrganizationsModal({
     }
   }, [isOpen, editingOrganizations, isEditing, reset]);
 
+  const planOptions = [
+    { value: "Free", label: "Free" },
+    { value: "Pro", label: "Pro" },
+    { value: "Enterprise", label: "Enterprise" },
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-[#1a1a2e] border-[rgba(91,194,231,0.2)] text-white">
@@ -229,11 +236,24 @@ export default function CreateEditOrganizationsModal({
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Plan</Label>
-            <Input
+            {/* <Input
               {...register("plan")}
               error={!!errors.plan}
               placeholder="enterprise"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
+            /> */}
+            <Controller
+              name="plan"
+              control={control}
+              render={({ field }) => (
+                <SelectSearch
+                  items={planOptions}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  error={!!errors.plan}
+                  placeholder="Select a plan"
+                />
+              )}
             />
             <FormError message={errors.plan?.message} />
           </div>
