@@ -14,6 +14,7 @@ const getValidationMessages = () => ({
   maxUsersInvalid: t("validation_max_users_invalid"),
   maxConnectionsInvalid: t("validation_max_connections_invalid"),
   maxAgentsInvalid: t("validation_max_agents_invalid"),
+  tunnelTypeRequired: t("validation_tunnel_type_required"),
 });
 
 // Schema factory function for creating organization
@@ -36,6 +37,18 @@ export const getCreateOrganizationSchema = () => {
     plan: z.enum(["Free", "Pro", "Enterprise"], {
       errorMap: () => ({ message: messages.planRequired }),
     }),
+
+    tunnel_type: z.enum(
+      ["Cloudflare", "Ssh_reverse", "Vpn", "Ngrok", "Direct"],
+      {
+        errorMap: () => ({ message: messages.tunnelTypeRequired }),
+      }
+    ),
+
+    tunnel_config: z.preprocess(
+      (val) => (val === "" || val === undefined || val === null ? null : val),
+      z.record(z.any()).nullable().optional()
+    ),
 
     max_users: z.preprocess((val) => {
       if (val === "" || val === null || val === undefined) return null;
@@ -77,6 +90,17 @@ export const getUpdateOrganizationSchema = () => {
       .optional(),
 
     plan: z.string().min(1, messages.planRequired).trim().optional(),
+
+    tunnel_type: z
+      .enum(["Cloudflare", "Ssh_reverse", "Vpn", "Ngrok", "Direct"], {
+        errorMap: () => ({ message: messages.tunnelTypeRequired }),
+      })
+      .optional(),
+
+    tunnel_config: z.preprocess(
+      (val) => (val === "" || val === undefined || val === null ? null : val),
+      z.record(z.any()).nullable().optional()
+    ),
 
     max_users: z.preprocess((val) => {
       if (val === "" || val === null || val === undefined) return null;

@@ -139,6 +139,20 @@ export const translations = {
     validation_file_size_min: "File size cannot be negative",
     validation_duration_min: "Duration cannot be negative",
     validation_user_id_required: "User authentication is required",
+    validation_agent_name_required: "Agent name is required",
+    validation_agent_name_min: "Agent name must be at least 1 character",
+    validation_agent_name_max: "Agent name must be at most 100 characters",
+    validation_hostname_required: "Hostname is required",
+    validation_hostname_min: "Hostname must be at least 1 character",
+    validation_hostname_max: "Hostname must be at most 255 characters",
+    validation_os_type_required: "OS type is required",
+    validation_tunnel_type_required: "Tunnel type is required",
+    validation_agent_token_required: "Agent token is required",
+    validation_agent_token_min: "Agent token must be at least 32 characters",
+    validation_port_invalid: "Port must be a valid number between 1 and 65535",
+    validation_url_invalid: "Invalid URL format",
+    validation_max_concurrent_sessions_invalid:
+      "Max concurrent sessions must be a positive integer or null",
   },
   es: {
     // Navigation
@@ -284,6 +298,25 @@ export const translations = {
     validation_duration_min: "La duración no puede ser negativa",
     validation_user_id_required:
       "Se requiere identificación de usuario de validación",
+    validation_agent_name_required: "El nombre del agente es requerido",
+    validation_agent_name_min:
+      "El nombre del agente debe tener al menos 1 carácter",
+    validation_agent_name_max:
+      "El nombre del agente debe tener como máximo 100 caracteres",
+    validation_hostname_required: "El hostname es requerido",
+    validation_hostname_min: "El hostname debe tener al menos 1 carácter",
+    validation_hostname_max:
+      "El hostname debe tener como máximo 255 caracteres",
+    validation_os_type_required: "El tipo de OS es requerido",
+    validation_tunnel_type_required: "El tipo de túnel es requerido",
+    validation_agent_token_required: "El token del agente es requerido",
+    validation_agent_token_min:
+      "El token del agente debe tener al menos 32 caracteres",
+    validation_port_invalid:
+      "El puerto debe ser un número válido entre 1 y 65535",
+    validation_url_invalid: "Formato de URL inválido",
+    validation_max_concurrent_sessions_invalid:
+      "El máximo de sesiones concurrentes debe ser un entero positivo o null",
   },
 };
 

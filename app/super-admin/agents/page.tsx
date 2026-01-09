@@ -1,80 +1,83 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { CrudPage } from "../_components/crud-page";
-import { Button } from "@/components/ui/button";
-import { Pencil, Plus, Trash2, CheckCircle, XCircle } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { AlertDialog } from "@/components/ui/alert-dialog";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+
 import {
-  deleteOrganization,
   getOrganizations,
   Organization,
 } from "@/lib/organization/organization";
-import { useloadingStore } from "@/store/loadingStore";
 import { formatDate } from "@/lib/utils";
-import CreateEditOrganizationsModal from "./components/CreateEditOrganizationsModal";
+import { deleteAgent, getAgents, type Agent } from "@/lib/agents/agents";
 
-export default function OrganizationsCrudPage() {
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { AlertDialog } from "@/components/ui/alert-dialog";
+import CreateEditAgentsModal from "./components/CreateEditAgentsModal";
+import { useloadingStore } from "@/store/loadingStore";
+
+export default function AgentsCrudPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [editingOrganization, setEditingOrganization] =
-    useState<Organization | null>(null);
-  const [deletingOrganization, setDeletingOrganization] =
-    useState<Organization | null>(null);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
+  const [deletingAgent, setDeletingAgent] = useState<Agent | null>(null);
   const queryClient = useQueryClient();
   const { isLoading, setIsLoading } = useloadingStore();
 
-  const { data: organization } = useQuery<Organization[]>({
+  const { data: agents } = useQuery<Agent[]>({
+    queryKey: ["agents"],
+    queryFn: getAgents,
+  });
+  const { data: organizations } = useQuery<Organization[]>({
     queryKey: ["organizations"],
     queryFn: getOrganizations,
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: deleteOrganization,
+    mutationFn: deleteAgent,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["organizations"],
+        queryKey: ["agents"],
       });
       setShowDeleteDialog(false);
-      setDeletingOrganization(null);
+      setDeletingAgent(null);
     },
   });
 
   const handleOpenDialog = () => {
-    setEditingOrganization(null);
+    setEditingAgent(null);
     setIsOpen(true);
   };
 
   const confirmDelete = () => {
-    mutate(deletingOrganization?.id ?? "");
+    mutate(deletingAgent?.id ?? "");
   };
 
-  const handleEdit = (it: Organization) => {
-    setEditingOrganization(it);
+  const handleEdit = (it: Agent) => {
+    setEditingAgent(it);
     setIsOpen(true);
   };
 
-  const handleDelete = (it: Organization) => {
-    setDeletingOrganization(it);
+  const handleDelete = (it: Agent) => {
+    setDeletingAgent(it);
     setShowDeleteDialog(true);
   };
 
-  // Managment the state the loading
+  // Management the state the loading
   useEffect(() => {
     if (isPending !== isLoading) {
       setIsLoading(isPending);
     }
-  }, [isPending]);
+  }, [isPending, isLoading, setIsLoading]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Organizations</h1>
+          <h1 className="text-2xl font-semibold text-white">Agents</h1>
           <p className="text-sm text-[#c0c5ce]">
-            Create, update and delete organizations.
+            Create, update and delete agents.
           </p>
         </div>
         <Button
@@ -92,29 +95,26 @@ export default function OrganizationsCrudPage() {
             <thead className="bg-[#0f0f1c] border-b border-[rgba(91,194,231,0.2)]">
               <tr className="text-left">
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">ID</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Name</th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Active
+                  Agent Name
                 </th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Plan</th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Slug</th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
+                  Hostname
+                </th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
+                  OS Type
+                </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
                   Tunnel Type
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Max Users
+                  Status
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Max Agents
-                </th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Max Connections
+                  Organization
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
                   Date of creation
-                </th>
-                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
-                  Date of Update
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold w-[160px]">
                   Actions
@@ -122,58 +122,66 @@ export default function OrganizationsCrudPage() {
               </tr>
             </thead>
             <tbody>
-              {organization?.length === 0 ? (
+              {agents?.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={11}
+                    colSpan={9}
                     className="py-10 px-4 text-center text-[#6b7280]"
                   >
                     No results.
                   </td>
                 </tr>
               ) : (
-                organization?.map((it) => (
+                agents?.map((it) => (
                   <tr
-                    key={it.id}
+                    key={it?.id ?? ""}
                     className="border-b border-[rgba(91,194,231,0.08)] hover:bg-[#1a1a2e]"
                   >
                     <td className="py-3 px-4 text-white font-medium">
-                      {it.id?.split("-")[0]}
+                      {it?.id?.split("-")[0] ?? ""}
                     </td>
                     <td className="py-3 px-4 text-white font-medium">
-                      {it.name}
-                    </td>
-                    <td className="py-3 px-4">
-                      {it.is_active ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <XCircle className="w-5 h-5 text-red-500" />
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.plan}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.slug}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.tunnel_type ?? "-"}
-                    </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.max_users}</td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.max_agents}
+                      {it?.agent_name ?? ""}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.max_connections}
+                      {it?.hostname ?? ""}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.created_at ? formatDate(it.created_at) : "-"}
+                      {it?.os_type ?? ""}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.updated_at ? formatDate(it.updated_at) : "-"}
+                      {it?.tunnel_type ?? ""}
+                    </td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-semibold ${
+                          it?.status === "Online"
+                            ? "bg-green-500/20 text-green-400"
+                            : it?.status === "Offline"
+                            ? "bg-gray-500/20 text-gray-400"
+                            : it?.status === "Maintenance"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {it?.status ?? ""}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      {organizations?.find(
+                        (organization) =>
+                          organization.id === it?.organization_id
+                      )?.name || "-"}
+                    </td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      {formatDate(it?.created_at ?? "")}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(it)}
+                          onClick={() => handleEdit(it ?? null)}
                           className="text-white hover:text-[#5bc2e7] hover:bg-[#0f0f1c]"
                         >
                           <Pencil className="w-4 h-4 mr-2" />
@@ -182,7 +190,7 @@ export default function OrganizationsCrudPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(it)}
+                          onClick={() => handleDelete(it ?? null)}
                           className="text-white hover:text-white hover:bg-[#ff6b6b]"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -198,17 +206,20 @@ export default function OrganizationsCrudPage() {
         </div>
       </Card>
 
-      <CreateEditOrganizationsModal
+      <CreateEditAgentsModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        editingOrganizations={editingOrganization}
+        organizations={organizations ?? []}
+        editingAgent={editingAgent ?? null}
       />
 
       <AlertDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         title={"Confirm delete"}
-        description={`¿Estás seguro de que deseas eliminar la organización "${deletingOrganization?.name}"? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de que deseas eliminar el agente "${
+          deletingAgent?.agent_name ?? ""
+        }"? Esta acción no se puede deshacer.`}
         confirmText={"Delete"}
         cancelText={"Cancel"}
         variant="destructive"

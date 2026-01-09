@@ -28,6 +28,7 @@ import {
   UpdateOrganizationFormData,
 } from "@/lib/organization/organization.schema";
 import { SelectSearch } from "@/components/ui/select-search";
+import { cn } from "@/lib/utils";
 
 interface CreateEditOrganizationsModalProps {
   isOpen: boolean;
@@ -63,6 +64,8 @@ export default function CreateEditOrganizationsModal({
       name: "",
       slug: "",
       plan: "",
+      tunnel_type: undefined,
+      tunnel_config: null,
       max_users: null,
       max_connections: null,
       max_agents: null,
@@ -102,7 +105,13 @@ export default function CreateEditOrganizationsModal({
       const createData: CreateOrganization = {
         name: (data as CreateOrganizationFormData).name,
         slug: (data as CreateOrganizationFormData).slug,
-        plan: (data as CreateOrganizationFormData).plan,
+        plan: (data as CreateOrganizationFormData).plan.toLowerCase(),
+        tunnel_type: (
+          data as CreateOrganizationFormData
+        ).tunnel_type.toLowerCase(),
+        tunnel_config:
+          (data as CreateOrganizationFormData).tunnel_config ??
+          ({} as Record<string, any>),
         max_users: toPositiveOrNull(
           (data as CreateOrganizationFormData).max_users
         ),
@@ -124,6 +133,12 @@ export default function CreateEditOrganizationsModal({
       ...(data.name !== editingOrganizations?.name ? { name: data.name } : {}),
       ...(data.slug !== editingOrganizations?.slug ? { slug: data.slug } : {}),
       ...(data.plan !== editingOrganizations?.plan ? { plan: data.plan } : {}),
+      ...(data.tunnel_type !== editingOrganizations?.tunnel_type
+        ? { tunnel_type: data.tunnel_type }
+        : {}),
+      ...(data.tunnel_config !== editingOrganizations?.tunnel_config
+        ? { tunnel_config: data.tunnel_config ?? null }
+        : {}),
       ...(data.max_users !== editingOrganizations?.max_users
         ? { max_users: toPositiveOrNull(data.max_users) ?? undefined }
         : {}),
@@ -173,10 +188,21 @@ export default function CreateEditOrganizationsModal({
     }
 
     if (isEditing && editingOrganizations) {
+      // Convert plan to proper case (first letter uppercase, rest lowercase)
+      const planValue = editingOrganizations.plan
+        ? ((editingOrganizations.plan.charAt(0).toUpperCase() +
+            editingOrganizations.plan.slice(1).toLowerCase()) as
+            | "Free"
+            | "Pro"
+            | "Enterprise")
+        : "";
+
       reset({
         name: editingOrganizations.name ?? "",
         slug: editingOrganizations.slug ?? "",
-        plan: editingOrganizations.plan ?? "",
+        plan: planValue,
+        tunnel_type: editingOrganizations.tunnel_type,
+        tunnel_config: editingOrganizations.tunnel_config ?? null,
         max_users: editingOrganizations.max_users ?? null,
         max_agents: editingOrganizations.max_agents ?? null,
         max_connections: editingOrganizations.max_connections ?? null,
@@ -187,6 +213,8 @@ export default function CreateEditOrganizationsModal({
         name: "",
         slug: "",
         plan: "",
+        tunnel_type: undefined,
+        tunnel_config: null,
         max_users: null,
         max_connections: null,
         max_agents: null,
@@ -199,6 +227,17 @@ export default function CreateEditOrganizationsModal({
     { value: "Pro", label: "Pro" },
     { value: "Enterprise", label: "Enterprise" },
   ];
+
+  const tunnelTypeOptions = [
+    { value: "Cloudflare", label: "Cloudflare" },
+    { value: "Ssh_reverse", label: "SSH Reverse" },
+    { value: "Vpn", label: "VPN" },
+    { value: "Ngrok", label: "Ngrok" },
+    { value: "Direct", label: "Direct" },
+  ];
+
+  // Watch select values
+  const tunnelType = watch("tunnel_type");
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -256,6 +295,71 @@ export default function CreateEditOrganizationsModal({
               )}
             />
             <FormError message={errors.plan?.message} />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[#c0c5ce]">Tunnel Type *</Label>
+            <Controller
+              name="tunnel_type"
+              control={control}
+              render={({ field }) => (
+                <SelectSearch
+                  items={tunnelTypeOptions}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  error={!!errors.tunnel_type}
+                  placeholder="Select tunnel type"
+                />
+              )}
+            />
+            <FormError message={errors.tunnel_type?.message} />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[#c0c5ce]">Tunnel Config</Label>
+            <Controller
+              name="tunnel_config"
+              control={control}
+              render={({ field }) => (
+                <textarea
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? field.value
+                        : JSON.stringify(field.value, null, 2)
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const value = e.target.value.trim();
+                    if (value === "") {
+                      field.onChange(null);
+                      return;
+                    }
+                    try {
+                      const parsed = JSON.parse(value);
+                      field.onChange(parsed);
+                    } catch {
+                      // If invalid JSON, just keep as string for now
+                      field.onChange(value);
+                    }
+                  }}
+                  onBlur={field.onBlur}
+                  placeholder='{"key": "value"}'
+                  className={cn(
+                    "w-full h-24 px-3 py-2 bg-[#11111f] border rounded-md text-white placeholder:text-gray-500 resize-none font-mono text-sm",
+                    "border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] focus:outline-none",
+                    errors.tunnel_config
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  )}
+                />
+              )}
+            />
+            <FormError
+              message={
+                typeof errors.tunnel_config?.message === "string"
+                  ? errors.tunnel_config.message
+                  : undefined
+              }
+            />
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Max Users</Label>

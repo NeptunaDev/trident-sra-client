@@ -1,6 +1,13 @@
 import { api } from "../axios";
 
 export type PlanType = "Free" | "Pro" | "Enterprise";
+export type TunnelType =
+  | "Cloudflare"
+  | "Ssh_reverse"
+  | "Vpn"
+  | "Ngrok"
+  | "Direct";
+
 export interface Organization {
   id: string;
   name: string;
@@ -10,6 +17,8 @@ export interface Organization {
   max_users: number;
   max_agents: number;
   max_connections: number;
+  tunnel_type: TunnelType;
+  tunnel_config: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
@@ -21,6 +30,8 @@ export interface CreateOrganization {
   max_users: number | null;
   max_connections: number | null;
   max_agents: number | null;
+  tunnel_type: string;
+  tunnel_config: Record<string, any> | null;
 }
 
 export interface updateOrganization extends Partial<CreateOrganization> {
