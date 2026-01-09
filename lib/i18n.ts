@@ -210,6 +210,9 @@ export const translations = {
     validation_action_max: "Action must be at most 255 characters",
     validation_status_required: "Status is required",
     validation_status_min: "Status must be at least 5 characters",
+    validation_command_min: "Command must be at least 1 character",
+    validation_command_max: "Command must be less than 1000 characters",
+    validation_output_max: "Output must be less than 10000 characters",
   },
   es: {
     // Navigation
@@ -425,6 +428,9 @@ export const translations = {
     validation_action_max: "La acción debe tener como máximo 255 caracteres",
     validation_status_required: "El estado es requerido",
     validation_status_min: "El estado debe tener al menos 5 caracteres",
+    validation_command_min: "El comando debe tener al menos 1 carácter",
+    validation_command_max: "El comando debe tener menos de 1000 caracteres",
+    validation_output_max: "La salida debe tener menos de 10000 caracteres",
   },
 };
 
