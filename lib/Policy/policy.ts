@@ -1,4 +1,4 @@
-import { api } from './axios'
+import { api } from '../axios'
 
 export interface Policy {
     id: string,
@@ -13,12 +13,12 @@ export interface Policy {
 }
 
 export interface CreatePolicy {
-    organization_id: string,
+    organization_id?: string,
     name: string,
-    description: string,
-    is_active: boolean,
-    blocked_patterns: string[],
-    applies_to_roles: string[],
+    description?: string,
+    is_active?: boolean,
+    blocked_patterns?: string[],
+    applies_to_roles?: string[],
     create_by_user_id: string,
 } 
 

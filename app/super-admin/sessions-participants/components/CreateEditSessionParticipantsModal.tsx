@@ -12,7 +12,7 @@ import {
   SessionParticipantRole,
 } from "@/lib/sessionParticipants/sessionParticipants";
 import { getUser, User } from "@/lib/user/user";
-import { getSession, Session } from "@/lib/session";
+import { getSession, Session } from "@/lib/Session/session";
 import { useloadingStore } from "@/store/loadingStore";
 import { Button } from "@/components/ui/button";
 import {
