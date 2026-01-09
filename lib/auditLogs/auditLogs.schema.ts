@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { t } from "@/lib/i18n";
+import { AuditLogStatus } from "./auditLogs";
 
 // Helper function to get validation messages
 const getValidationMessages = () => ({
@@ -30,9 +31,13 @@ export const getCreateAuditLogSchema = () => {
       .transform((val) => (val === "" ? null : val))
       .optional(),
 
-    status: z.enum(["success", "failure"], {
-      errorMap: () => ({ message: messages.statusRequired }),
-    }),
+    status: z
+      .nativeEnum(AuditLogStatus, {
+        required_error: messages.statusRequired,
+        invalid_type_error: messages.statusRequired,
+      })
+      .nullable()
+      .optional(),
 
     details: z.record(z.any()).nullable().optional(),
 
@@ -70,9 +75,11 @@ export const getUpdateAuditLogSchema = () => {
       .optional(),
 
     status: z
-      .enum(["success", "failure"], {
-        errorMap: () => ({ message: messages.statusRequired }),
+      .nativeEnum(AuditLogStatus, {
+        required_error: messages.statusRequired,
+        invalid_type_error: messages.statusRequired,
       })
+      .nullable()
       .optional(),
 
     details: z.record(z.any()).nullable().optional(),

@@ -8,7 +8,7 @@ import {
   createAuditLogs,
   updateAuditLogs,
   AuditLogs,
-  Status,
+  AuditLogStatus,
 } from "@/lib/auditLogs/auditLogs";
 
 import {
@@ -81,7 +81,7 @@ export default function CreateEditAuditLogsModal({
       event_type: "",
       action: "",
       description: "",
-      status: "",
+      status: undefined,
       user_id: "",
       organization_id: "",
       details: null,
@@ -120,7 +120,7 @@ export default function CreateEditAuditLogsModal({
         event_type: data.event_type as string,
         action: data.action as string,
         description: data.description || null,
-        status: data.status as Status,
+        status: (data.status as AuditLogStatus | null | undefined) ?? null,
         details: data.details || null,
         organization_id: data.organization_id || null,
         user_id: data.user_id || null,
@@ -134,7 +134,7 @@ export default function CreateEditAuditLogsModal({
       event_type?: string;
       action?: string;
       description?: string | null;
-      status?: Status;
+      status?: AuditLogStatus | null;
       details?: Record<string, any> | null;
       organization_id?: string | null;
       user_id?: string | null;
@@ -154,8 +154,8 @@ export default function CreateEditAuditLogsModal({
     ) {
       updateData.description = data.description || null;
     }
-    if (data.status && data.status !== editingAuditLog?.status) {
-      updateData.status = data.status as Status;
+    if (data.status !== undefined && data.status !== editingAuditLog?.status) {
+      updateData.status = data.status as AuditLogStatus | null;
     }
     if (
       data.organization_id !== undefined &&
@@ -185,7 +185,7 @@ export default function CreateEditAuditLogsModal({
         event_type: "",
         action: "",
         description: "",
-        status: "",
+        status: undefined,
         user_id: "",
         organization_id: "",
         details: null,
@@ -198,7 +198,7 @@ export default function CreateEditAuditLogsModal({
         event_type: editingAuditLog.event_type ?? "",
         action: editingAuditLog.action ?? "",
         description: editingAuditLog.description ?? "",
-        status: editingAuditLog.status ?? "",
+        status: editingAuditLog.status ?? undefined,
         organization_id: editingAuditLog.organization_id ?? "",
         user_id: editingAuditLog.user_id ?? "",
         details: editingAuditLog.details ?? null,
@@ -208,7 +208,7 @@ export default function CreateEditAuditLogsModal({
         event_type: "",
         action: "",
         description: "",
-        status: "",
+        status: undefined,
         user_id: "",
         organization_id: "",
         details: null,
@@ -217,8 +217,8 @@ export default function CreateEditAuditLogsModal({
   }, [isOpen, editingAuditLog, isEditing, reset]);
 
   const StatusOption = [
-    { value: "success", label: "Success" },
-    { value: "failure", label: "Failure" },
+    { value: AuditLogStatus.SUCCESS, label: "Success" },
+    { value: AuditLogStatus.FAILURE, label: "Failure" },
   ];
 
   return (
@@ -279,10 +279,14 @@ export default function CreateEditAuditLogsModal({
               render={({ field }) => (
                 <SelectSearch
                   items={StatusOption}
-                  value={field.value}
-                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                  onValueChange={(value) =>
+                    field.onChange(
+                      value ? (value as AuditLogStatus) : undefined
+                    )
+                  }
                   error={!!errors.status}
-                  placeholder="Select a plan"
+                  placeholder="Select status"
                 />
               )}
             />

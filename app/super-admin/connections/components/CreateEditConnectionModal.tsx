@@ -1,14 +1,26 @@
 "use client";
 
-import { useEffect } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { createConnection, updateConnection, Connection } from "@/lib/Connection/connections"
+import {
+  createConnection,
+  updateConnection,
+  Connection,
+  Protocol,
+  ConnectionStatus,
+  UpdateConnection,
+} from "@/lib/Connection/connections";
 import { Organization } from "@/lib/organization/organization";
-import { getCurrentUser } from "@/lib/user/user"
-import { CreateConnectionFormData, UpdateConnectionFormData, getCreateConnectionSchema, getUpdateConnectionSchema } from "@/lib/Connection/connections.schema"
+import { getCurrentUser } from "@/lib/user/user";
+import {
+  CreateConnectionFormData,
+  UpdateConnectionFormData,
+  getCreateConnectionSchema,
+  getUpdateConnectionSchema,
+} from "@/lib/Connection/connections.schema";
 
 import { useloadingStore } from "@/store/loadingStore";
 
@@ -34,26 +46,25 @@ interface CreateEditConnectionModalProps {
 }
 
 const PROTOCOL_OPTIONS = [
-  { label: "SSH", value: "ssh" },
-  { label: "RDP", value: "rdp" },
-  { label: "VNC", value: "vnc" },
-  { label: "Telnet", value: "telnet" },
+  { label: "SSH", value: Protocol.SSH },
+  { label: "RDP", value: Protocol.RDP },
+  { label: "VNC", value: Protocol.VNC },
 ];
 
 const STATUS_OPTIONS = [
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
+  { label: "Active", value: ConnectionStatus.ACTIVE },
+  { label: "Inactive", value: ConnectionStatus.INACTIVE },
 ];
 
-export default function CreateEditConnectionModal({ 
-  isOpen, 
-  setIsOpen, 
-  organizations, 
-  editingConnection 
+export default function CreateEditConnectionModal({
+  isOpen,
+  setIsOpen,
+  organizations,
+  editingConnection,
 }: CreateEditConnectionModalProps) {
-  const isEditing = !!editingConnection
-  const { isLoading, setIsLoading } = useloadingStore()
-  const queryClient = useQueryClient()
+  const isEditing = !!editingConnection;
+  const { isLoading, setIsLoading } = useloadingStore();
+  const queryClient = useQueryClient();
 
   // Use the correct schema based on whether we're editing or creating
   const {
@@ -64,27 +75,29 @@ export default function CreateEditConnectionModal({
     setValue,
     watch,
   } = useForm<CreateConnectionFormData | UpdateConnectionFormData>({
-    resolver: zodResolver(isEditing ? getUpdateConnectionSchema() : getCreateConnectionSchema()),
+    resolver: zodResolver(
+      isEditing ? getUpdateConnectionSchema() : getCreateConnectionSchema()
+    ),
     mode: "onBlur", // Validates when field loses focus
     defaultValues: {
       name: "",
-      protocol: "ssh",
+      protocol: Protocol.SSH,
       hostname: "",
       port: 22,
       username: "",
       password: "",
       organization_id: "",
       description: "",
-      status: "active",
+      status: ConnectionStatus.ACTIVE,
     },
-  })
-  
+  });
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: CreateConnectionFormData) => {
-      const user = await getCurrentUser()
+      const user = await getCurrentUser();
       return createConnection({
         name: data.name,
-        protocol: data.protocol,
+        protocol: data.protocol as Protocol,
         hostname: data.hostname,
         port: data.port ?? 22, //default port
         username: data.username,
@@ -93,74 +106,114 @@ export default function CreateEditConnectionModal({
         create_by_user_id: user.id,
         total_sessions: 0,
         ...(data.description ? { description: data.description } : {}),
-        ...(data.status ? { status: data.status } : {}),
-      })
+        ...(data.status ? { status: data.status as ConnectionStatus } : {}),
+      });
     },
     onSuccess: () => {
-      setIsOpen(false)
-      reset()
+      setIsOpen(false);
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["connections"],
       });
     },
-  })
+  });
   const { mutate: updateMutate, isPending: isUpdatePending } = useMutation({
     mutationFn: updateConnection,
     onSuccess: () => {
-      setIsOpen(false)
-      reset()
+      setIsOpen(false);
+      reset();
       queryClient.invalidateQueries({
         queryKey: ["connections"],
       });
     },
-  })
+  });
 
-  const onSubmit = (data: CreateConnectionFormData | UpdateConnectionFormData) => {
+  const onSubmit = (
+    data: CreateConnectionFormData | UpdateConnectionFormData
+  ) => {
     if (!isEditing) {
-      mutate(data as CreateConnectionFormData)
-      return
+      mutate(data as CreateConnectionFormData);
+      return;
     }
-    updateMutate({
-      id: editingConnection?.id ?? "",
-      ...(data.password?.trim() !== "" ? { password: data.password } : {}),
-      ...(data.name !== editingConnection?.name ? { name: data.name } : {}),
-      ...(data.protocol !== editingConnection?.protocol ? { protocol: data.protocol } : {}),
-      ...(data.hostname !== editingConnection?.hostname ? { hostname: data.hostname } : {}),
-      ...(data.port !== editingConnection?.port ? { port: data.port ?? 22 } : {}),
-      ...(data.username !== editingConnection?.username ? { username: data.username } : {}),
-      ...(data.organization_id !== editingConnection?.organization_id ? { organization_id: data.organization_id } : {}),
-      ...(data.description !== editingConnection?.description ? { description: data.description } : {}),
-      ...(data.status !== editingConnection?.status ? { status: data.status } : {}),
-    })
-  }
+    if (!editingConnection?.id) return;
+
+    const updateData: UpdateConnection = {
+      id: editingConnection.id,
+    };
+
+    if (data.name !== undefined && data.name !== editingConnection.name) {
+      updateData.name = data.name;
+    }
+    if (
+      data.protocol !== undefined &&
+      data.protocol !== editingConnection.protocol
+    ) {
+      updateData.protocol = data.protocol as Protocol;
+    }
+    if (
+      data.hostname !== undefined &&
+      data.hostname !== editingConnection.hostname
+    ) {
+      updateData.hostname = data.hostname;
+    }
+    if (data.port !== undefined && data.port !== editingConnection.port) {
+      updateData.port = data.port ?? 22;
+    }
+    if (
+      data.username !== undefined &&
+      data.username !== editingConnection.username
+    ) {
+      updateData.username = data.username;
+    }
+    if (data.password !== undefined && data.password.trim() !== "") {
+      updateData.password = data.password;
+    }
+    if (
+      data.organization_id !== undefined &&
+      data.organization_id !== editingConnection.organization_id
+    ) {
+      updateData.organization_id = data.organization_id;
+    }
+    if (
+      data.description !== undefined &&
+      data.description !== (editingConnection.description ?? "")
+    ) {
+      updateData.description = data.description;
+    }
+    if (data.status !== undefined && data.status !== editingConnection.status) {
+      updateData.status = data.status as ConnectionStatus;
+    }
+
+    updateMutate(updateData);
+  };
 
   // Watch select values
-  const protocol = watch("protocol")
-  const organizationId = watch("organization_id")
-  const status = watch("status")
+  const protocol = watch("protocol");
+  const organizationId = watch("organization_id");
+  const status = watch("status");
 
   // Manage loading state
   useEffect(() => {
-    setIsLoading(isPending || isUpdatePending)
-  }, [isPending, isUpdatePending, setIsLoading])
+    setIsLoading(isPending || isUpdatePending);
+  }, [isPending, isUpdatePending, setIsLoading]);
 
   // Manage form state when editing connection
   // Reset form when edit mode changes
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     if (!isEditing || !editingConnection) {
       reset({
         name: "",
-        protocol: "ssh",
+        protocol: Protocol.SSH,
         hostname: "",
         port: 22,
         username: "",
         password: "",
         organization_id: "",
         description: "",
-        status: "active",
-      })
-      return
+        status: ConnectionStatus.ACTIVE,
+      });
+      return;
     }
     reset({
       name: editingConnection.name,
@@ -172,8 +225,8 @@ export default function CreateEditConnectionModal({
       organization_id: editingConnection.organization_id,
       description: editingConnection.description ?? "",
       status: editingConnection.status,
-    })
-  }, [isOpen, isEditing, editingConnection, reset])
+    });
+  }, [isOpen, isEditing, editingConnection, reset]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -199,7 +252,11 @@ export default function CreateEditConnectionModal({
             <SelectSearch
               items={PROTOCOL_OPTIONS}
               value={protocol}
-              onValueChange={(value) => setValue("protocol", value, { shouldValidate: true })}
+              onValueChange={(value) =>
+                setValue("protocol", value as Protocol, {
+                  shouldValidate: true,
+                })
+              }
               error={!!errors.protocol}
             />
             <FormError message={errors.protocol?.message} />
@@ -249,8 +306,15 @@ export default function CreateEditConnectionModal({
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Organization</Label>
             <SelectSearch
-              items={organizations?.map((organization) => ({ label: organization.name, value: organization.id })) ?? []}
-              onValueChange={(value) => setValue("organization_id", value, { shouldValidate: true })}
+              items={
+                organizations?.map((organization) => ({
+                  label: organization.name,
+                  value: organization.id,
+                })) ?? []
+              }
+              onValueChange={(value) =>
+                setValue("organization_id", value, { shouldValidate: true })
+              }
               value={organizationId}
               error={!!errors.organization_id}
             />
@@ -261,7 +325,11 @@ export default function CreateEditConnectionModal({
             <SelectSearch
               items={STATUS_OPTIONS}
               value={status}
-              onValueChange={(value) => setValue("status", value, { shouldValidate: true })}
+              onValueChange={(value) =>
+                setValue("status", value as ConnectionStatus, {
+                  shouldValidate: true,
+                })
+              }
               error={!!errors.status}
             />
             <FormError message={errors.status?.message} />
