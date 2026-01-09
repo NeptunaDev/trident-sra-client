@@ -116,11 +116,13 @@ export const translations = {
     validation_duration_invalid: "Duration must be a valid number",
     validation_duration_max: "Duration is too large",
     validation_public_session_id_required: "Public session ID is required",
-    validation_public_session_id_max: "Public session ID must be less than 100 characters",
+    validation_public_session_id_max:
+      "Public session ID must be less than 100 characters",
     validation_connection_id_required: "Connection ID is required",
     validation_commands_min: "Commands count must be at least 0",
     validation_total_commands_max: "Total commands cannot exceed 2,147,483,647",
-    validation_blocked_commands_max: "Blocked commands cannot exceed 2,147,483,647",
+    validation_blocked_commands_max:
+      "Blocked commands cannot exceed 2,147,483,647",
     validation_slug_required: "Slug is required",
     validation_slug_min: "Slug must be at least 1 character",
     validation_slug_max: "Slug must be at most 100 characters",
@@ -281,20 +283,28 @@ export const translations = {
     validation_port_min: "El puerto debe ser al menos 1",
     validation_port_max: "El puerto debe ser menor o igual a 65535",
     validation_username_required: "El nombre de usuario es requerido",
-    validation_username_max: "El nombre de usuario debe tener menos de 255 caracteres",
+    validation_username_max:
+      "El nombre de usuario debe tener menos de 255 caracteres",
     validation_password_max: "La contraseña debe tener menos de 255 caracteres",
-    validation_description_max: "La descripción debe tener menos de 255 caracteres",
-    validation_file_name_max: "El nombre del archivo debe tener menos de 255 caracteres",
-    validation_file_size_invalid: "El tamaño del archivo debe ser un número válido",
+    validation_description_max:
+      "La descripción debe tener menos de 255 caracteres",
+    validation_file_name_max:
+      "El nombre del archivo debe tener menos de 255 caracteres",
+    validation_file_size_invalid:
+      "El tamaño del archivo debe ser un número válido",
     validation_file_size_max: "El tamaño del archivo es demasiado grande",
     validation_duration_invalid: "La duración debe ser un número válido",
     validation_duration_max: "La duración es demasiado grande",
-    validation_public_session_id_required: "El ID público de sesión es requerido",
-    validation_public_session_id_max: "El ID público de sesión debe tener menos de 100 caracteres",
+    validation_public_session_id_required:
+      "El ID público de sesión es requerido",
+    validation_public_session_id_max:
+      "El ID público de sesión debe tener menos de 100 caracteres",
     validation_connection_id_required: "El ID de conexión es requerido",
     validation_commands_min: "El conteo de comandos debe ser al menos 0",
-    validation_total_commands_max: "El total de comandos no puede exceder 2,147,483,647",
-    validation_blocked_commands_max: "Los comandos bloqueados no pueden exceder 2,147,483,647",
+    validation_total_commands_max:
+      "El total de comandos no puede exceder 2,147,483,647",
+    validation_blocked_commands_max:
+      "Los comandos bloqueados no pueden exceder 2,147,483,647",
     validation_slug_required: "El slug es requerido",
     validation_slug_min: "El slug debe tener al menos 1 carácter",
     validation_slug_max: "El slug debe tener como máximo 100 caracteres",
