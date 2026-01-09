@@ -30,3 +30,27 @@ export const login = async (loginData: Login): Promise<LoginResponse> => {
     throw error
   }
 }
+
+export interface Register {
+  email: string
+  password: string
+  name: string
+  organization_name: string
+  organization_slug: string
+}
+
+export interface RegisterResponse {
+  access_token: string
+  refresh_token: string
+  token_type: string
+}
+
+export const register = async (registerData: Register): Promise<RegisterResponse> => {
+  try {
+    const response = await api.post<RegisterResponse>('/api/v1/auth/register', registerData)
+    return response.data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
