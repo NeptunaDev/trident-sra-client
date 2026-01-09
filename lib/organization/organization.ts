@@ -2,11 +2,11 @@ import { api } from "../axios";
 
 export type PlanType = "Free" | "Pro" | "Enterprise";
 export type TunnelType =
-  | "Cloudflare"
-  | "Ssh_reverse"
-  | "Vpn"
-  | "Ngrok"
-  | "Direct";
+  | "cloudflare"
+  | "ssh_reverse"
+  | "vpn"
+  | "ngrok"
+  | "direct";
 
 export interface Organization {
   id: string;

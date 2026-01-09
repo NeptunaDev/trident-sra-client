@@ -258,25 +258,25 @@ export default function CreateEditAgentsModal({
   }, [isOpen, editingAgent, isEditing, reset]);
 
   const osTypeOptions = [
-    { value: "Windows", label: "Windows" },
-    { value: "Linux", label: "Linux" },
-    { value: "Freebsd", label: "FreeBSD" },
-    { value: "Macos", label: "macOS" },
+    { value: "windows", label: "Windows" },
+    { value: "linux", label: "Linux" },
+    { value: "freebsd", label: "FreeBSD" },
+    { value: "macos", label: "macOS" },
   ];
 
   const tunnelTypeOptions = [
-    { value: "Cloudflare", label: "Cloudflare" },
-    { value: "Ssh_reverse", label: "SSH Reverse" },
-    { value: "Vpn", label: "VPN" },
-    { value: "Ngrok", label: "Ngrok" },
-    { value: "Direct", label: "Direct" },
+    { value: "cloudflare", label: "Cloudflare" },
+    { value: "ssh_reverse", label: "SSH Reverse" },
+    { value: "vpn", label: "VPN" },
+    { value: "ngrok", label: "Ngrok" },
+    { value: "direct", label: "Direct" },
   ];
 
   const statusOptions = [
-    { value: "Online", label: "Online" },
-    { value: "Offline", label: "Offline" },
-    { value: "Maintenance", label: "Maintenance" },
-    { value: "Error", label: "Error" },
+    { value: "online", label: "Online" },
+    { value: "offline", label: "Offline" },
+    // { value: "maintenance", label: "Maintenance" },
+    { value: "error", label: "Error" },
   ];
 
   return (

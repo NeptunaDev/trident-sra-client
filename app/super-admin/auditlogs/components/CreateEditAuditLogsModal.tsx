@@ -217,8 +217,8 @@ export default function CreateEditAuditLogsModal({
   }, [isOpen, editingAuditLog, isEditing, reset]);
 
   const StatusOption = [
-    { value: "Success", label: "Success" },
-    { value: "Failure", label: "Failure" },
+    { value: "success", label: "Success" },
+    { value: "failure", label: "Failure" },
   ];
 
   return (

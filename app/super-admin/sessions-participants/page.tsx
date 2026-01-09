@@ -168,7 +168,9 @@ export default function SessionsParticipantsCrudPage() {
                             : "text-[#95a5a6]"
                         }`}
                       >
-                        {it.role}
+                        {it.role
+                          ? it.role.charAt(0).toUpperCase() + it.role.slice(1)
+                          : "-"}
                       </Badge>
                     </td>
                     <td className="py-3 px-4 text-white font-medium">

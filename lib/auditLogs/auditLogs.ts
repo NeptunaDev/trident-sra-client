@@ -1,6 +1,6 @@
 import { api } from "../axios";
 
-export type Status = "Success" | "Failure";
+export type Status = "success" | "failure";
 export interface AuditLogs {
   id: string;
   event_type: string;

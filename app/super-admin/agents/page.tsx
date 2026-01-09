@@ -147,24 +147,47 @@ export default function AgentsCrudPage() {
                       {it?.hostname ?? ""}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it?.os_type ?? ""}
+                      {it?.os_type
+                        ? it.os_type
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join("_")
+                        : ""}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it?.tunnel_type ?? ""}
+                      {it?.tunnel_type
+                        ? it.tunnel_type
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join("_")
+                        : ""}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
                       <span
                         className={`px-2 py-1 rounded text-xs font-semibold ${
-                          it?.status === "Online"
+                          it?.status === "online"
                             ? "bg-green-500/20 text-green-400"
-                            : it?.status === "Offline"
+                            : it?.status === "offline"
                             ? "bg-gray-500/20 text-gray-400"
-                            : it?.status === "Maintenance"
-                            ? "bg-yellow-500/20 text-yellow-400"
-                            : "bg-red-500/20 text-red-400"
+                            : // it?.status === "maintenance"
+                            // ? "bg-yellow-500/20 text-yellow-400"
+                            it?.status === "error"
+                            ? "bg-red-500/20 text-red-400"
+                            : "bg-gray-500/20 text-gray-400"
                         }`}
                       >
-                        {it?.status ?? ""}
+                        {it?.status
+                          ? it.status.charAt(0).toUpperCase() +
+                            it.status.slice(1)
+                          : ""}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">

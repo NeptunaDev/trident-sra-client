@@ -106,9 +106,7 @@ export default function CreateEditOrganizationsModal({
         name: (data as CreateOrganizationFormData).name,
         slug: (data as CreateOrganizationFormData).slug,
         plan: (data as CreateOrganizationFormData).plan.toLowerCase(),
-        tunnel_type: (
-          data as CreateOrganizationFormData
-        ).tunnel_type.toLowerCase(),
+        tunnel_type: (data as CreateOrganizationFormData).tunnel_type,
         tunnel_config:
           (data as CreateOrganizationFormData).tunnel_config ??
           ({} as Record<string, any>),
@@ -229,11 +227,11 @@ export default function CreateEditOrganizationsModal({
   ];
 
   const tunnelTypeOptions = [
-    { value: "Cloudflare", label: "Cloudflare" },
-    { value: "Ssh_reverse", label: "SSH Reverse" },
-    { value: "Vpn", label: "VPN" },
-    { value: "Ngrok", label: "Ngrok" },
-    { value: "Direct", label: "Direct" },
+    { value: "cloudflare", label: "Cloudflare" },
+    { value: "ssh_reverse", label: "SSH Reverse" },
+    { value: "vpn", label: "VPN" },
+    { value: "ngrok", label: "Ngrok" },
+    { value: "direct", label: "Direct" },
   ];
 
   // Watch select values

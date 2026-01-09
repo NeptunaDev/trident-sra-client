@@ -153,7 +153,16 @@ export default function OrganizationsCrudPage() {
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.plan}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.slug}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
-                      {it.tunnel_type ?? "-"}
+                      {it.tunnel_type
+                        ? it.tunnel_type
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join("_")
+                        : "-"}
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.max_users}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">

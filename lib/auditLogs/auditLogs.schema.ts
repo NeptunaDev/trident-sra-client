@@ -30,7 +30,7 @@ export const getCreateAuditLogSchema = () => {
       .transform((val) => (val === "" ? null : val))
       .optional(),
 
-    status: z.enum(["Success", "Failure"], {
+    status: z.enum(["success", "failure"], {
       errorMap: () => ({ message: messages.statusRequired }),
     }),
 
@@ -70,9 +70,9 @@ export const getUpdateAuditLogSchema = () => {
       .optional(),
 
     status: z
-      .string()
-      .min(5, messages.statusMin)
-      .max(50, messages.statusMax)
+      .enum(["success", "failure"], {
+        errorMap: () => ({ message: messages.statusRequired }),
+      })
       .optional(),
 
     details: z.record(z.any()).nullable().optional(),

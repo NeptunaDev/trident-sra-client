@@ -12,7 +12,7 @@ const sessionParticipantsBase = (
 ) => ({
   session_id: z.string().uuid(messages.sessionIdRequired).min(1),
   user_id: z.string().uuid(messages.userIdRequired).min(1),
-  role: z.enum(["Owner", "Collaborator", "Observer"]),
+  role: z.enum(["owner", "collaborator", "observer"]),
   can_write: z.boolean().default(false),
   join_at: z.string().nullable().optional(),
 });

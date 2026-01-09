@@ -40,7 +40,7 @@ interface CreateEditSessionParticipantsModalProps {
   editingSessionParticipant: SessionParticipant | null;
 }
 
-const ROLES: SessionParticipantRole[] = ["Owner", "Collaborator", "Observer"];
+const ROLES: SessionParticipantRole[] = ["owner", "collaborator", "observer"];
 
 type FormData = {
   session_id: string;
@@ -53,7 +53,7 @@ type FormData = {
 const INITIAL_FORM: FormData = {
   session_id: "",
   user_id: "",
-  role: "Observer",
+  role: "observer",
   can_write: false,
   join_at: new Date().toISOString(),
 };
@@ -143,7 +143,7 @@ export default function CreateEditSessionParticipantsModal({
         user_id: editingSessionParticipant.user_id ?? "",
         role:
           (editingSessionParticipant.role as SessionParticipantRole) ??
-          "Observer",
+          "observer",
         can_write: editingSessionParticipant.can_write ?? false,
         join_at: editingSessionParticipant.join_at ?? new Date().toISOString(),
       });
@@ -263,7 +263,7 @@ export default function CreateEditSessionParticipantsModal({
                         value={role}
                         className="hover:bg-[#1a1a2e]"
                       >
-                        {role}
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>

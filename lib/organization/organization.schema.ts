@@ -39,7 +39,7 @@ export const getCreateOrganizationSchema = () => {
     }),
 
     tunnel_type: z.enum(
-      ["Cloudflare", "Ssh_reverse", "Vpn", "Ngrok", "Direct"],
+      ["cloudflare", "ssh_reverse", "vpn", "ngrok", "direct"],
       {
         errorMap: () => ({ message: messages.tunnelTypeRequired }),
       }
@@ -92,7 +92,7 @@ export const getUpdateOrganizationSchema = () => {
     plan: z.string().min(1, messages.planRequired).trim().optional(),
 
     tunnel_type: z
-      .enum(["Cloudflare", "Ssh_reverse", "Vpn", "Ngrok", "Direct"], {
+      .enum(["cloudflare", "ssh_reverse", "vpn", "ngrok", "direct"], {
         errorMap: () => ({ message: messages.tunnelTypeRequired }),
       })
       .optional(),

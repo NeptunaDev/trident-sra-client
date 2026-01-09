@@ -34,7 +34,7 @@ export const getCreateAgentSchema = () => {
       .max(255, messages.hostnameMax)
       .trim(),
 
-    os_type: z.enum(["Windows", "Linux", "Freebsd", "Macos"], {
+    os_type: z.enum(["windows", "linux", "freebsd", "macos"], {
       errorMap: () => ({ message: messages.osTypeRequired }),
     }),
 
@@ -44,7 +44,7 @@ export const getCreateAgentSchema = () => {
     ),
 
     tunnel_type: z.enum(
-      ["Cloudflare", "Ssh_reverse", "Vpn", "Ngrok", "Direct"],
+      ["cloudflare", "ssh_reverse", "vpn", "ngrok", "direct"],
       {
         errorMap: () => ({ message: messages.tunnelTypeRequired }),
       }
@@ -138,7 +138,7 @@ export const getUpdateAgentSchema = () => {
       .optional(),
 
     os_type: z
-      .enum(["Windows", "Linux", "Freebsd", "Macos"], {
+      .enum(["windows", "linux", "freebsd", "macos"], {
         errorMap: () => ({ message: messages.osTypeRequired }),
       })
       .optional(),
@@ -149,12 +149,12 @@ export const getUpdateAgentSchema = () => {
     ),
 
     tunnel_type: z
-      .enum(["Cloudflare", "Ssh_reverse", "Vpn", "Ngrok", "Direct"], {
+      .enum(["cloudflare", "ssh_reverse", "vpn", "ngrok", "direct"], {
         errorMap: () => ({ message: messages.tunnelTypeRequired }),
       })
       .optional(),
 
-    status: z.enum(["Online", "Offline", "Maintenance", "Error"]).optional(),
+    status: z.enum(["online", "offline", "error"]).optional(), // ["online", "offline", "maintenance", "error"]
 
     public_ws_url: z.preprocess(
       (val) => (val === "" || val === undefined ? null : val),

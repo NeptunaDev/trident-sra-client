@@ -1,13 +1,13 @@
 import { api } from "../axios";
 
-export type OsType = "Windows" | "Linux" | "Freebsd" | "Macos";
+export type OsType = "windows" | "linux" | "freebsd" | "macos";
 export type TunnelType =
-  | "Cloudflare"
-  | "Ssh_reverse"
-  | "Vpn"
-  | "Ngrok"
-  | "Direct";
-export type AgentStatus = "Online" | "Offline" | "Maintenance" | "Error";
+  | "cloudflare"
+  | "ssh_reverse"
+  | "vpn"
+  | "ngrok"
+  | "direct";
+export type AgentStatus = "online" | "offline" | "error"; // | "maintenance";
 
 export interface Agent {
   id: string;
