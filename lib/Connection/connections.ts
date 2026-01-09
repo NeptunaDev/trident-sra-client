@@ -1,4 +1,4 @@
-import { api } from "./axios"
+import { api } from "../axios"
 
 export interface Connection {
   id: string,
@@ -18,7 +18,7 @@ export interface Connection {
   updated_at: string
 }
 export interface CreateConnection {
-  organization_id:string,
+  organization_id: string,
   create_by_user_id: string,
   name: string,
   protocol: string,
@@ -26,8 +26,8 @@ export interface CreateConnection {
   port: number,
   username: string,
   password: string,
-  description: string,
-  status: string,
+  description?: string,
+  status?: string,
   total_sessions: number,
 }
 
