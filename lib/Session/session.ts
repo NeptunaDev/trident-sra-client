@@ -1,11 +1,18 @@
 import { api } from "../axios";
 
+export enum SessionStatus {
+  PREPARING = "preparing",
+  ACTIVE = "active",
+  ENDED = "ended",
+  ERROR = "error",
+}
+
 export interface Session {
   id: string;
   public_session_id: string;
   connection_id: string;
   initiated_by_user_id: string;
-  status: string;
+  status: SessionStatus;
   started_at: string;
   ended_at: string;
   duration_seconds: number;
@@ -21,7 +28,7 @@ export interface CreateSession {
   connection_id: string;
   initiated_by_user_id: string;
   recording_enabled?: boolean;
-  status?: string;
+  status?: SessionStatus;
   duration_seconds?: number;
   recording_url?: string;
   total_commands?: number;

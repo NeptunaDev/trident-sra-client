@@ -17,6 +17,7 @@ import {
   Video,
   TerminalSquare,
   Network,
+  Bot,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ const navItems: NavItem[] = [
   { title: "Sessions", href: "/super-admin/sessions", icon: PlayCircle },
   { title: "Recordings", href: "/super-admin/recordings", icon: Video },
   { title: "Commands", href: "/super-admin/commands", icon: TerminalSquare },
+  { title: "Agents", href: "/super-admin/agents", icon: Bot },
 ];
 
 export function SuperAdminSidebar() {
@@ -75,6 +77,7 @@ export function SuperAdminSidebar() {
               "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
               "hover:bg-[#1a1a2e] hover:text-[#5bc2e7]",
               pathname === item.href ||
+                pathname.startsWith(`${item.href}/`) ||
                 (item.href === "/super-admin/dashboard" &&
                   pathname === "/super-admin")
                 ? "bg-[#1a1a2e] text-[#5bc2e7]"

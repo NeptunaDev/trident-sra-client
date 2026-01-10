@@ -1,13 +1,14 @@
 "use client";
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   createAuditLogs,
   updateAuditLogs,
   AuditLogs,
+  AuditLogStatus,
 } from "@/lib/auditLogs/auditLogs";
 
 import {
@@ -70,6 +71,7 @@ export default function CreateEditAuditLogsModal({
     reset,
     setValue,
     watch,
+    control,
   } = useForm<CreateAuditLogFormData | UpdateAuditLogFormData>({
     resolver: zodResolver(
       isEditing ? getUpdateAuditLogSchema() : getCreateAuditLogSchema()
@@ -79,7 +81,7 @@ export default function CreateEditAuditLogsModal({
       event_type: "",
       action: "",
       description: "",
-      status: "",
+      status: undefined,
       user_id: "",
       organization_id: "",
       details: null,
@@ -118,7 +120,7 @@ export default function CreateEditAuditLogsModal({
         event_type: data.event_type as string,
         action: data.action as string,
         description: data.description || null,
-        status: data.status as string,
+        status: (data.status as AuditLogStatus | null | undefined) ?? null,
         details: data.details || null,
         organization_id: data.organization_id || null,
         user_id: data.user_id || null,
@@ -132,7 +134,7 @@ export default function CreateEditAuditLogsModal({
       event_type?: string;
       action?: string;
       description?: string | null;
-      status?: string;
+      status?: AuditLogStatus | null;
       details?: Record<string, any> | null;
       organization_id?: string | null;
       user_id?: string | null;
@@ -152,8 +154,8 @@ export default function CreateEditAuditLogsModal({
     ) {
       updateData.description = data.description || null;
     }
-    if (data.status && data.status !== editingAuditLog?.status) {
-      updateData.status = data.status as string;
+    if (data.status !== undefined && data.status !== editingAuditLog?.status) {
+      updateData.status = data.status as AuditLogStatus | null;
     }
     if (
       data.organization_id !== undefined &&
@@ -183,7 +185,7 @@ export default function CreateEditAuditLogsModal({
         event_type: "",
         action: "",
         description: "",
-        status: "",
+        status: undefined,
         user_id: "",
         organization_id: "",
         details: null,
@@ -196,7 +198,7 @@ export default function CreateEditAuditLogsModal({
         event_type: editingAuditLog.event_type ?? "",
         action: editingAuditLog.action ?? "",
         description: editingAuditLog.description ?? "",
-        status: editingAuditLog.status ?? "",
+        status: editingAuditLog.status ?? undefined,
         organization_id: editingAuditLog.organization_id ?? "",
         user_id: editingAuditLog.user_id ?? "",
         details: editingAuditLog.details ?? null,
@@ -206,13 +208,18 @@ export default function CreateEditAuditLogsModal({
         event_type: "",
         action: "",
         description: "",
-        status: "",
+        status: undefined,
         user_id: "",
         organization_id: "",
         details: null,
       });
     }
   }, [isOpen, editingAuditLog, isEditing, reset]);
+
+  const StatusOption = [
+    { value: AuditLogStatus.SUCCESS, label: "Success" },
+    { value: AuditLogStatus.FAILURE, label: "Failure" },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -260,11 +267,28 @@ export default function CreateEditAuditLogsModal({
           </div>
           <div className="space-y-2">
             <Label className="text-[#c0c5ce]">Status</Label>
-            <Input
+            {/* <Input
               {...register("status")}
               error={!!errors.status}
               placeholder="success"
               className="bg-[#11111f] border-[rgba(91,194,231,0.2)] focus:border-[#5bc2e7] text-white"
+            /> */}
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <SelectSearch
+                  items={StatusOption}
+                  value={field.value || ""}
+                  onValueChange={(value) =>
+                    field.onChange(
+                      value ? (value as AuditLogStatus) : undefined
+                    )
+                  }
+                  error={!!errors.status}
+                  placeholder="Select status"
+                />
+              )}
             />
             <FormError message={errors.status?.message} />
           </div>

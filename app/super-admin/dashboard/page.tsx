@@ -1,17 +1,85 @@
-import Link from "next/link"
-import { Users, KeyRound, Building2, ScrollText, FileKey2, UserRound, PlayCircle, Video, TerminalSquare } from "lucide-react"
+import Link from "next/link";
+import {
+  Users,
+  KeyRound,
+  Building2,
+  ScrollText,
+  FileKey2,
+  UserRound,
+  PlayCircle,
+  Video,
+  TerminalSquare,
+  Bot,
+} from "lucide-react";
 
 const cards = [
-  { title: "Users", href: "/super-admin/users", icon: Users, description: "Manage platform users." },
-  { title: "Roles", href: "/super-admin/roles", icon: KeyRound, description: "Define access roles." },
-  { title: "Organizations", href: "/super-admin/organizations", icon: Building2, description: "Manage tenants and orgs." },
-  { title: "Audit Logs", href: "/super-admin/auditlogs", icon: ScrollText, description: "Review security events." },
-  { title: "Policies", href: "/super-admin/policies", icon: FileKey2, description: "Create enforcement policies." },
-  { title: "Participants", href: "/super-admin/participants", icon: UserRound, description: "Session participants catalog." },
-  { title: "Sessions", href: "/super-admin/sessions", icon: PlayCircle, description: "Manage privileged sessions." },
-  { title: "Recordings", href: "/super-admin/recordings", icon: Video, description: "Review session recordings." },
-  { title: "Commands", href: "/super-admin/commands", icon: TerminalSquare, description: "Command catalog / blocks." },
-]
+  {
+    title: "Users",
+    href: "/super-admin/users",
+    icon: Users,
+    description: "Manage platform users.",
+  },
+  {
+    title: "Roles",
+    href: "/super-admin/roles",
+    icon: KeyRound,
+    description: "Define access roles.",
+  },
+  {
+    title: "Organizations",
+    href: "/super-admin/organizations",
+    icon: Building2,
+    description: "Manage tenants and orgs.",
+  },
+  {
+    title: "Audit Logs",
+    href: "/super-admin/auditlogs",
+    icon: ScrollText,
+    description: "Review security events.",
+  },
+  {
+    title: "Policies",
+    href: "/super-admin/policies",
+    icon: FileKey2,
+    description: "Create enforcement policies.",
+  },
+  {
+    title: "Participants",
+    href: "/super-admin/participants",
+    icon: UserRound,
+    description: "Session participants catalog.",
+  },
+  {
+    title: "Sessions Participants",
+    href: "/super-admin/sessions-participants",
+    icon: PlayCircle,
+    description: "Manage session participants.",
+  },
+  {
+    title: "Sessions",
+    href: "/super-admin/sessions",
+    icon: PlayCircle,
+    description: "Manage privileged sessions.",
+  },
+  {
+    title: "Recordings",
+    href: "/super-admin/recordings",
+    icon: Video,
+    description: "Review session recordings.",
+  },
+  {
+    title: "Commands",
+    href: "/super-admin/commands",
+    icon: TerminalSquare,
+    description: "Command catalog / blocks.",
+  },
+  {
+    title: "Agents",
+    href: "/super-admin/agents",
+    icon: Bot,
+    description: "Manage agents and their configurations.",
+  },
+];
 
 export default function SuperAdminDashboardPage() {
   return (
@@ -34,12 +102,14 @@ export default function SuperAdminDashboardPage() {
               </div>
               <div className="min-w-0">
                 <div className="text-white font-semibold">{c.title}</div>
-                <div className="text-sm text-[#c0c5ce] truncate">{c.description}</div>
+                <div className="text-sm text-[#c0c5ce] truncate">
+                  {c.description}
+                </div>
               </div>
             </div>
           </Link>
         ))}
       </div>
     </div>
-  )
+  );
 }

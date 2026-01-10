@@ -144,7 +144,11 @@ export default function AuditLogsCrudPage() {
                     <td className="py-3 px-4 text-[#c0c5ce] max-w-xs truncate">
                       {it.description}
                     </td>
-                    <td className="py-3 px-4 text-[#c0c5ce]">{it.status}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      {it.status
+                        ? it.status.charAt(0).toUpperCase() + it.status.slice(1)
+                        : "-"}
+                    </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
                       {it.user_id?.split("-")[0] || "-"}
                     </td>

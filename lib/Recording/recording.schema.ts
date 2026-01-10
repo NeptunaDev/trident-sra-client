@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { t } from "@/lib/i18n";
+import { RecordingStatus } from "./session_recording";
 
 // Helper function to get validation messages
 const getValidationMessages = () => ({
@@ -10,7 +11,8 @@ const getValidationMessages = () => ({
     fileSizeMax: t("validation_file_size_max"),
     durationInvalid: t("validation_duration_invalid"),
     durationMax: t("validation_duration_max"),
-    statusMax: t("validation_status_max"),
+    durationMin: t("validation_duration_min"),
+    statusRequired: t("validation_status_required"),
     sessionIdRequired: t("validation_session_id_required"),
 });
 
@@ -35,13 +37,14 @@ export const getCreateSessionRecordingSchema = () => {
 
         duration_seconds: z
             .number({ invalid_type_error: messages.durationInvalid })
+            .min(0, messages.durationMin)
             .max(Number.MAX_SAFE_INTEGER, messages.durationMax)
             .optional(),
         
-        status: z
-            .string()
-            .max(50, messages.statusMax)
-            .optional(),
+        status: z.nativeEnum(RecordingStatus, {
+            required_error: messages.statusRequired,
+            invalid_type_error: messages.statusRequired,
+        }).optional(),
         
         session_id: z
             .string()
@@ -53,6 +56,11 @@ export const getCreateSessionRecordingSchema = () => {
 export const getUpdateSessionRecordingSchema = () => {
     const messages = getValidationMessages();
     return z.object({
+        session_id: z
+            .string()
+            .min(1, messages.sessionIdRequired)
+            .optional(),
+        
         file_url: z
             .string()
             .min(1, messages.fileUrlRequired)
@@ -71,13 +79,14 @@ export const getUpdateSessionRecordingSchema = () => {
 
         duration_seconds: z
             .number({ invalid_type_error: messages.durationInvalid })
+            .min(0, messages.durationMin)
             .max(Number.MAX_SAFE_INTEGER, messages.durationMax)
             .optional(),
         
-        status: z
-            .string()
-            .max(50, messages.statusMax)
-            .optional(),
+        status: z.nativeEnum(RecordingStatus, {
+            required_error: messages.statusRequired,
+            invalid_type_error: messages.statusRequired,
+        }).optional(),
     });
 };
 
