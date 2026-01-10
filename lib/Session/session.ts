@@ -1,8 +1,9 @@
 import { api } from "../axios";
 
 export enum SessionStatus {
-  EXECUTED = "executed",
-  BLOCKED = "blocked",
+  PREPARING = "preparing",
+  ACTIVE = "active",
+  ENDED = "ended",
   ERROR = "error",
 }
 

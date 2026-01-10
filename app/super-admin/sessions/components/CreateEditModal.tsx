@@ -43,9 +43,10 @@ interface CreateEditModalProps {
 }
 
 const STATUS_OPTIONS = [
-  { label: "Executed", value: SessionStatus.EXECUTED },
-  { label: "Blocked", value: SessionStatus.BLOCKED },
-  { label: "Error", value: SessionStatus.ERROR },
+  { label: "preparing", value: SessionStatus.PREPARING },
+  { label: "active", value: SessionStatus.ACTIVE },
+  { label: "ended", value: SessionStatus.ENDED },
+  { label: "error", value: SessionStatus.ERROR },
 ];
 
 export default function CreateEditSessionModal({
@@ -73,7 +74,7 @@ export default function CreateEditSessionModal({
     defaultValues: {
       public_session_id: "",
       connection_id: "",
-      status: SessionStatus.EXECUTED,
+      status: SessionStatus.ACTIVE,
       recording_enabled: false,
       total_commands: 0,
       blocked_commands: 0,
@@ -186,7 +187,7 @@ export default function CreateEditSessionModal({
       reset({
         public_session_id: "",
         connection_id: "",
-        status: SessionStatus.EXECUTED,
+        status: SessionStatus.ACTIVE,
         recording_enabled: false,
         total_commands: 0,
         blocked_commands: 0,
@@ -199,7 +200,7 @@ export default function CreateEditSessionModal({
       public_session_id: editingSession.public_session_id,
       connection_id: editingSession.connection_id,
       recording_enabled: editingSession.recording_enabled ?? false,
-      status: editingSession.status ?? SessionStatus.EXECUTED,
+      status: editingSession.status ?? SessionStatus.ACTIVE,
       duration_seconds: editingSession.duration_seconds ?? 0,
       recording_url: editingSession.recording_url ?? "",
       total_commands: editingSession.total_commands ?? 0,

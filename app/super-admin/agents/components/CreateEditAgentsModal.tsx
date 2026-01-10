@@ -275,7 +275,7 @@ export default function CreateEditAgentsModal({
   const statusOptions = [
     { value: "online", label: "Online" },
     { value: "offline", label: "Offline" },
-    // { value: "maintenance", label: "Maintenance" },
+    { value: "maintenance", label: "Maintenance" },
     { value: "error", label: "Error" },
   ];
 

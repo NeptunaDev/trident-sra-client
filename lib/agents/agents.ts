@@ -7,7 +7,7 @@ export type TunnelType =
   | "vpn"
   | "ngrok"
   | "direct";
-export type AgentStatus = "online" | "offline" | "error"; // | "maintenance";
+export type AgentStatus = "online" | "offline" | "error" | "maintenance";
 
 export interface Agent {
   id: string;

@@ -154,7 +154,7 @@ export const getUpdateAgentSchema = () => {
       })
       .optional(),
 
-    status: z.enum(["online", "offline", "error"]).optional(), // ["online", "offline", "maintenance", "error"]
+    status: z.enum(["online", "offline", "maintenance", "error"]).optional(),
 
     public_ws_url: z.preprocess(
       (val) => (val === "" || val === undefined ? null : val),
