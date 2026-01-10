@@ -26,6 +26,76 @@ export const translations = {
     forgot_password: "Forgot password?",
     no_account: "Don't have an account?",
     have_account: "Already have an account?",
+    create_account: "Create Account",
+    creating_account: "Creating Account...",
+    continue: "Continue",
+    full_name: "Full Name",
+    work_email: "Work Email",
+    organization_name: "Organization Name",
+    organization_slug: "Organization Slug",
+    account_info: "Account Info",
+    organization_setup: "Organization Setup",
+    step_of: "Step {step} of {total}",
+    create_trident_account: "Create your TRIDENT account",
+    terms_agreement: "I agree to the",
+    terms_agreement_and: "and",
+    terms_of_service: "Terms of Service",
+    privacy_policy: "Privacy Policy",
+    must_accept_terms:
+      "You must accept the Terms of Service and Privacy Policy to continue",
+    // Tooltips
+    tooltip_full_name: "Enter your full name as it will appear in your profile",
+    tooltip_work_email:
+      "Use your work email address. This will be used for account verification and notifications",
+    tooltip_organization_name:
+      "The official name of your company or organization",
+    tooltip_organization_slug:
+      "A URL-friendly identifier for your organization. Only lowercase letters, numbers, and hyphens are allowed. This will be used in your organization's URL",
+    tooltip_password:
+      "Password must be at least 8 characters and contain uppercase, lowercase letters, and numbers",
+    // Modals
+    privacy_policy_title: "Privacy Policy",
+    terms_of_service_title: "Terms of Service",
+    privacy_section_1_title: "1. Information We Collect",
+    privacy_section_1_content:
+      "We collect information that you provide directly to us, including your name, email address, organization details, and any other information you choose to provide when using our services.",
+    privacy_section_2_title: "2. How We Use Your Information",
+    privacy_section_2_content:
+      "We use the information we collect to provide, maintain, and improve our services, process your transactions, send you technical notices and support messages, and respond to your comments and questions.",
+    privacy_section_3_title: "3. Information Sharing",
+    privacy_section_3_content:
+      "We do not sell, trade, or rent your personal information to third parties. We may share your information only in the circumstances described in this policy or with your consent.",
+    privacy_section_4_title: "4. Data Security",
+    privacy_section_4_content:
+      "We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.",
+    privacy_section_5_title: "5. Your Rights",
+    privacy_section_5_content:
+      "You have the right to access, update, or delete your personal information at any time. You may also object to the processing of your personal information or request data portability.",
+    privacy_section_6_title: "6. Contact Us",
+    privacy_section_6_content:
+      "If you have any questions about this Privacy Policy, please contact us at privacy@trident.com",
+    terms_section_1_title: "1. Acceptance of Terms",
+    terms_section_1_content:
+      "By accessing and using TRIDENT, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our service.",
+    terms_section_2_title: "2. Use License",
+    terms_section_2_content:
+      "Permission is granted to temporarily use TRIDENT for personal and commercial purposes. This is the grant of a license, not a transfer of title, and under this license you may not modify, copy, or use the materials for any commercial purpose.",
+    terms_section_3_title: "3. User Account",
+    terms_section_3_content:
+      "You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.",
+    terms_section_4_title: "4. Prohibited Uses",
+    terms_section_4_content:
+      "You may not use TRIDENT in any way that causes, or may cause, damage to the service or impairment of the availability or accessibility of the service, or in any way which is unlawful, illegal, fraudulent, or harmful.",
+    terms_section_5_title: "5. Limitation of Liability",
+    terms_section_5_content:
+      "In no event shall TRIDENT or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on TRIDENT.",
+    terms_section_6_title: "6. Revisions",
+    terms_section_6_content:
+      "TRIDENT may revise these terms of service at any time without notice. By using this service you are agreeing to be bound by the then current version of these terms of service.",
+    terms_section_7_title: "7. Contact Information",
+    terms_section_7_content:
+      "If you have any questions about these Terms of Service, please contact us at support@trident.com",
+    last_updated: "Last updated:",
 
     // Dashboard
     welcome_back: "Welcome back",
@@ -175,6 +245,9 @@ export const translations = {
     validation_url_invalid: "Invalid URL format",
     validation_max_concurrent_sessions_invalid:
       "Max concurrent sessions must be a positive integer or null",
+    validation_command_min: "Command must be at least 1 character",
+    validation_command_max: "Command must be less than 1000 characters",
+    validation_output_max: "Output must be less than 10000 characters",
   },
   es: {
     // Navigation
@@ -201,6 +274,75 @@ export const translations = {
     forgot_password: "¿Olvidaste tu contraseña?",
     no_account: "¿No tienes cuenta?",
     have_account: "¿Ya tienes cuenta?",
+    create_account: "Crear Cuenta",
+    creating_account: "Creando Cuenta...",
+    continue: "Continuar",
+    full_name: "Nombre Completo",
+    work_email: "Correo de Trabajo",
+    organization_name: "Nombre de la Organización",
+    organization_slug: "Slug de la Organización",
+    account_info: "Información de Cuenta",
+    organization_setup: "Configuración de Organización",
+    step_of: "Paso {step} de {total}",
+    create_trident_account: "Crea tu cuenta TRIDENT",
+    terms_agreement: "Acepto los",
+    terms_agreement_and: "y",
+    terms_of_service: "Términos de Servicio",
+    privacy_policy: "Política de Privacidad",
+    must_accept_terms:
+      "Debes aceptar los Términos de Servicio y la Política de Privacidad para continuar",
+    // Tooltips
+    tooltip_full_name: "Ingresa tu nombre completo como aparecerá en tu perfil",
+    tooltip_work_email:
+      "Usa tu correo de trabajo. Este será usado para verificación de cuenta y notificaciones",
+    tooltip_organization_name: "El nombre oficial de tu empresa u organización",
+    tooltip_organization_slug:
+      "Un identificador amigable para URL de tu organización. Solo letras minúsculas, números y guiones están permitidos. Esto se usará en la URL de tu organización",
+    tooltip_password:
+      "La contraseña debe tener al menos 8 caracteres y contener letras mayúsculas, minúsculas y números",
+    // Modals
+    privacy_policy_title: "Política de Privacidad",
+    terms_of_service_title: "Términos de Servicio",
+    privacy_section_1_title: "1. Información que Recopilamos",
+    privacy_section_1_content:
+      "Recopilamos información que nos proporcionas directamente, incluyendo tu nombre, dirección de correo electrónico, detalles de la organización y cualquier otra información que elijas proporcionar al usar nuestros servicios.",
+    privacy_section_2_title: "2. Cómo Usamos Tu Información",
+    privacy_section_2_content:
+      "Usamos la información que recopilamos para proporcionar, mantener y mejorar nuestros servicios, procesar tus transacciones, enviarte avisos técnicos y mensajes de soporte, y responder a tus comentarios y preguntas.",
+    privacy_section_3_title: "3. Compartir Información",
+    privacy_section_3_content:
+      "No vendemos, intercambiamos ni alquilamos tu información personal a terceros. Podemos compartir tu información solo en las circunstancias descritas en esta política o con tu consentimiento.",
+    privacy_section_4_title: "4. Seguridad de Datos",
+    privacy_section_4_content:
+      "Implementamos medidas técnicas y organizativas apropiadas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción.",
+    privacy_section_5_title: "5. Tus Derechos",
+    privacy_section_5_content:
+      "Tienes derecho a acceder, actualizar o eliminar tu información personal en cualquier momento. También puedes oponerte al procesamiento de tu información personal o solicitar portabilidad de datos.",
+    privacy_section_6_title: "6. Contáctanos",
+    privacy_section_6_content:
+      "Si tienes alguna pregunta sobre esta Política de Privacidad, por favor contáctanos en privacy@trident.com",
+    terms_section_1_title: "1. Aceptación de Términos",
+    terms_section_1_content:
+      "Al acceder y usar TRIDENT, aceptas y acuerdas estar sujeto a los términos y disposiciones de este acuerdo. Si no estás de acuerdo con estos términos, por favor no uses nuestro servicio.",
+    terms_section_2_title: "2. Licencia de Uso",
+    terms_section_2_content:
+      "Se otorga permiso para usar TRIDENT temporalmente para fines personales y comerciales. Esta es la concesión de una licencia, no una transferencia de título, y bajo esta licencia no puedes modificar, copiar o usar los materiales para ningún propósito comercial.",
+    terms_section_3_title: "3. Cuenta de Usuario",
+    terms_section_3_content:
+      "Eres responsable de mantener la confidencialidad de tu cuenta y contraseña. Aceptas asumir la responsabilidad de todas las actividades que ocurran bajo tu cuenta.",
+    terms_section_4_title: "4. Usos Prohibidos",
+    terms_section_4_content:
+      "No puedes usar TRIDENT de ninguna manera que cause, o pueda causar, daño al servicio o deterioro de la disponibilidad o accesibilidad del servicio, o de cualquier manera que sea ilegal, fraudulenta o dañina.",
+    terms_section_5_title: "5. Limitación de Responsabilidad",
+    terms_section_5_content:
+      "En ningún caso TRIDENT o sus proveedores serán responsables de ningún daño (incluyendo, sin limitación, daños por pérdida de datos o ganancias, o debido a interrupción del negocio) que surja del uso o incapacidad de usar los materiales en TRIDENT.",
+    terms_section_6_title: "6. Revisiones",
+    terms_section_6_content:
+      "TRIDENT puede revisar estos términos de servicio en cualquier momento sin previo aviso. Al usar este servicio, aceptas estar sujeto a la versión actual de estos términos de servicio.",
+    terms_section_7_title: "7. Información de Contacto",
+    terms_section_7_content:
+      "Si tienes alguna pregunta sobre estos Términos de Servicio, por favor contáctanos en support@trident.com",
+    last_updated: "Última actualización:",
 
     // Dashboard
     welcome_back: "Bienvenido de nuevo",
@@ -367,6 +509,9 @@ export const translations = {
     validation_url_invalid: "Formato de URL inválido",
     validation_max_concurrent_sessions_invalid:
       "El máximo de sesiones concurrentes debe ser un entero positivo o null",
+    validation_command_min: "El comando debe tener al menos 1 carácter",
+    validation_command_max: "El comando debe tener menos de 1000 caracteres",
+    validation_output_max: "La salida debe tener menos de 10000 caracteres",
   },
 };
 
