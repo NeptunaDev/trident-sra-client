@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { TridentLogo } from "./trident-logo"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { TridentLogo } from "./trident-logo";
 import {
   Home,
   Server,
@@ -18,28 +18,28 @@ import {
   Monitor,
   Eye,
   LogOut,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { translations, getLanguage, type Language } from "@/lib/i18n"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { translations, getLanguage, type Language } from "@/lib/i18n";
 
 interface NavItem {
-  title: string
-  titleEs: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  children?: NavItem[]
+  title: string;
+  titleEs: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children?: NavItem[];
 }
 
 export function DashboardSidebar() {
-  const pathname = usePathname()
-  const [expandedItems, setExpandedItems] = useState<string[]>(["Connections"])
-  const [lang, setLang] = useState<Language>("en")
+  const pathname = usePathname();
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Connections"]);
+  const [lang, setLang] = useState<Language>("en");
 
   useEffect(() => {
-    setLang(getLanguage())
-  }, [])
+    setLang(getLanguage());
+  }, []);
 
-  const t = translations[lang]
+  const t = translations[lang];
 
   const navItems: NavItem[] = [
     {
@@ -54,9 +54,24 @@ export function DashboardSidebar() {
       href: "/dashboard/connections",
       icon: Server,
       children: [
-        { title: "SSH", titleEs: "SSH", href: "/dashboard/connections/ssh", icon: Terminal },
-        { title: "RDP", titleEs: "RDP", href: "/dashboard/connections/rdp", icon: Monitor },
-        { title: "VNC", titleEs: "VNC", href: "/dashboard/connections/vnc", icon: Eye },
+        {
+          title: "SSH",
+          titleEs: "SSH",
+          href: "/dashboard/connections/ssh",
+          icon: Terminal,
+        },
+        {
+          title: "RDP",
+          titleEs: "RDP",
+          href: "/dashboard/connections/rdp",
+          icon: Monitor,
+        },
+        {
+          title: "VNC",
+          titleEs: "VNC",
+          href: "/dashboard/connections/vnc",
+          icon: Eye,
+        },
       ],
     },
     {
@@ -77,11 +92,15 @@ export function DashboardSidebar() {
       href: "/dashboard/settings",
       icon: Settings,
     },
-  ]
+  ];
 
   const toggleExpand = (title: string) => {
-    setExpandedItems((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]))
-  }
+    setExpandedItems((prev) =>
+      prev.includes(title)
+        ? prev.filter((item) => item !== title)
+        : [...prev, title]
+    );
+  };
 
   return (
     <aside className="w-64 bg-[#11111f] border-r border-[rgba(91,194,231,0.2)] flex flex-col h-screen">
@@ -102,7 +121,9 @@ export function DashboardSidebar() {
                     className={cn(
                       "flex-1 flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                       "hover:bg-[#1a1a2e] hover:text-[#5bc2e7]",
-                      pathname.startsWith(item.href) ? "bg-[#1a1a2e] text-[#5bc2e7]" : "text-[#c0c5ce]",
+                      pathname.startsWith(item.href)
+                        ? "bg-[#1a1a2e] text-[#5bc2e7]"
+                        : "text-[#c0c5ce]"
                     )}
                   >
                     <item.icon className="w-4 h-4" />
@@ -110,8 +131,8 @@ export function DashboardSidebar() {
                   </Link>
                   <button
                     onClick={(e) => {
-                      e.preventDefault()
-                      toggleExpand(item.title)
+                      e.preventDefault();
+                      toggleExpand(item.title);
                     }}
                     className="p-2 hover:bg-[#1a1a2e] hover:text-[#5bc2e7] rounded-md transition-colors text-[#c0c5ce]"
                   >
@@ -131,11 +152,15 @@ export function DashboardSidebar() {
                         className={cn(
                           "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
                           "hover:bg-[#1a1a2e] hover:text-[#5bc2e7]",
-                          pathname === child.href ? "bg-[#1a1a2e] text-[#5bc2e7]" : "text-[#c0c5ce]",
+                          pathname === child.href
+                            ? "bg-[#1a1a2e] text-[#5bc2e7]"
+                            : "text-[#c0c5ce]"
                         )}
                       >
                         <child.icon className="w-4 h-4" />
-                        <span>{lang === "en" ? child.title : child.titleEs}</span>
+                        <span>
+                          {lang === "en" ? child.title : child.titleEs}
+                        </span>
                       </Link>
                     ))}
                   </div>
@@ -147,7 +172,9 @@ export function DashboardSidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                   "hover:bg-[#1a1a2e] hover:text-[#5bc2e7]",
-                  pathname === item.href ? "bg-[#1a1a2e] text-[#5bc2e7]" : "text-[#c0c5ce]",
+                  pathname === item.href
+                    ? "bg-[#1a1a2e] text-[#5bc2e7]"
+                    : "text-[#c0c5ce]"
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -169,5 +196,5 @@ export function DashboardSidebar() {
         </Link>
       </div>
     </aside>
-  )
+  );
 }

@@ -99,6 +99,9 @@ export default function OrganizationsCrudPage() {
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Plan</th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">Slug</th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
+                  Tunnel Type
+                </th>
+                <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
                   Max Users
                 </th>
                 <th className="py-3 px-4 text-[#c0c5ce] font-semibold">
@@ -122,7 +125,7 @@ export default function OrganizationsCrudPage() {
               {organization?.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={3}
+                    colSpan={11}
                     className="py-10 px-4 text-center text-[#6b7280]"
                   >
                     No results.
@@ -149,6 +152,18 @@ export default function OrganizationsCrudPage() {
                     </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.plan}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.slug}</td>
+                    <td className="py-3 px-4 text-[#c0c5ce]">
+                      {it.tunnel_type
+                        ? it.tunnel_type
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join("_")
+                        : "-"}
+                    </td>
                     <td className="py-3 px-4 text-[#c0c5ce]">{it.max_users}</td>
                     <td className="py-3 px-4 text-[#c0c5ce]">
                       {it.max_agents}
